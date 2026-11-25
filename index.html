@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="theme-color" content="#0f172a">
+  <title>QuickKB - Photo Size Reducer in KB (20KB, 50KB), Signature Resizer & PDF Tools</title>
+  <meta name="description" content="Free online photo size reducer in KB (20KB, 50KB), signature resizer 10KB-20KB, front & back Aadhar joiner, compress PDF under 150KB, and age calculator for SSC, Banking, BPSC, Bihar Board & CBSE.">
+  <link href="https://googleapis.com" rel="stylesheet">
+  <script src="https://unpkg.com"></script>
+  <script src="https://cloudflare.com"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="topbar">
+    <div class="top-wrap">
+      <div class="brand">⚡ <span class="brand-name">QuickKB</span> <small class="pro-tag">PRO</small></div>
+      <div class="search-wrap">
+        <input type="text" id="toolSearch" placeholder="🔍 Search (20KB Photo, Sign, PDF, Aadhar, Age)..." onkeyup="searchTools()">
+      </div>
+      <div class="top-actions">
+        <button class="bell-btn" onclick="toggleAlerts()" title="Exam Alerts">🔔 <span id="bellBadge" class="badge-dot">3</span></button>
+        <button class="ai-nav-btn" onclick="toggleAssistant()">🤖 Help</button>
+        <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- LOGIN-LESS NOTIFICATION DROPDOWN -->
+  <div id="alertDropdown" class="alert-dropdown">
+    <div class="alert-head"><strong>🔔 Latest Form Size Alerts</strong><button onclick="markAlertsRead()">Mark Read</button></div>
+    <div id="alertList"></div>
+  </div>
+
+  <!-- HERO SECTION WITH HIGH-VOLUME SEO KEYWORDS -->
+  <header class="hero-banner">
+    <div class="hero-inner">
+      <span class="pill-tag">100% PRIVATE • BROWSER-ONLY • ANDROID, iOS, MAC &amp; WINDOWS</span>
+      <h1>Photo Size Reducer in KB, Signature Resizer &amp; PDF Studio</h1>
+      <p>Instant 20KB–50KB Photo &amp; Signature Maker, Front-Back ID Joiner, PDF Compressor &amp; Age Calculator for SSC, Railway, Banking, BPSC, State Boards &amp; CBSE.</p>
+
+      <div class="exam-bar">
+        <span class="bar-label">Quick Preset:</span>
+        <button class="exam-chip active" onclick="applyExamMode(48, 19, 200, 230, 'SSC / Railway (Photo 20-50KB, Sign 10-20KB)', this)">SSC / Railway</button>
+        <button class="exam-chip" onclick="applyExamMode(45, 19, 200, 230, 'Banking IBPS / SBI (200x230px, <50KB)', this)">Banking (IBPS/SBI)</button>
+        <button class="exam-chip" onclick="applyExamMode(48, 19, 250, 250, 'BPSC / State Police (<50KB)', this)">BPSC / Police</button>
+        <button class="exam-chip" onclick="applyExamMode(45, 19, 300, 360, 'Bihar / UP / State Boards (<50KB)', this)">State Boards</button>
+        <button class="exam-chip" onclick="applyExamMode(38, 38, 350, 450, 'CBSE / ICSE Board (<40KB + Name/Date)', this)">CBSE / ICSE</button>
+        <button class="exam-chip" onclick="applyExamMode(95, 28, 350, 450, 'UPSC / NEET / JEE (<100KB)', this)">UPSC / NEET</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <main class="app-container">
+    <!-- SIDEBAR (BECOMES SWIPEABLE PILL BAR ON MOBILE) -->
+    <aside class="tools-sidebar" id="sidebarMenu">
+      <div class="side-title">MOST USED TOOLS</div>
+      <button class="side-btn active" data-keys="photo size reducer 20kb 50kb ssc banking name date" onclick="switchTool('photoTool', this)">
+        <span class="s-icon">📸</span><div><strong>Photo Resizer (20–50KB)</strong><small>Exact KB + Pixels + Name/Date</small></div>
+      </button>
+      <button class="side-btn" data-keys="signature resizer 10kb 20kb white background cleaner" onclick="switchTool('signTool', this)">
+        <span class="s-icon">✍️</span><div><strong>Signature Resizer (10–20KB)</strong><small>White Background Cleaner</small></div>
+      </button>
+      <button class="side-btn" data-keys="compress pdf under 100kb 150kb 200kb marksheet" onclick="switchTool('compressPdfTool', this)">
+        <span class="s-icon">📉</span><div><strong>Compress PDF (&lt;150KB)</strong><small>Reduce Marksheet PDF Size</small></div>
+      </button>
+      <button class="side-btn" data-keys="front back id card aadhar voter 1 page joiner" onclick="switchTool('idJoinTool', this)">
+        <span class="s-icon">🪪</span><div><strong>Front + Back ID Joiner</strong><small>Aadhar Card on 1 Page</small></div>
+      </button>
+      <button class="side-btn" data-keys="jpg to pdf image marksheet converter" onclick="switchTool('pdfTool', this)">
+        <span class="s-icon">📄</span><div><strong>JPG / Images to PDF</strong><small>Combine Photos to 1 PDF</small></div>
+      </button>
+
+      <div class="side-title" style="margin-top:8px;">MORE PRO UTILITIES</div>
+      <button class="side-btn" data-keys="scanner camscanner self attested stamp document" onclick="switchTool('scanTool', this)">
+        <span class="s-icon">📃</span><div><strong>Doc Scan + Self-Attested</strong><small>Clean Scan + Stamp</small></div>
+      </button>
+      <button class="side-btn" data-keys="convert image jpg jpeg png webp bmp format" onclick="switchTool('convTool', this)">
+        <span class="s-icon">🔄</span><div><strong>All-Format Image Converter</strong><small>JPG, JPEG, PNG, WEBP, BMP</small></div>
+      </button>
+      <button class="side-btn" data-keys="pdf to jpg png extract image" onclick="switchTool('pdfToImgTool', this)">
+        <span class="s-icon">🖼️</span><div><strong>PDF to JPG / PNG</strong><small>Extract Pages as Images</small></div>
+      </button>
+      <button class="side-btn" data-keys="merge split rotate unlock password pdf" onclick="switchTool('pdfOrganizeTool', this)">
+        <span class="s-icon">📑</span><div><strong>Merge / Split / Rotate PDF</strong><small>Organize PDF Pages</small></div>
+      </button>
+      <button class="side-btn" data-keys="a4 print sheet 8 passport photo cyber cafe" onclick="switchTool('sheetTool', this)">
+        <span class="s-icon">🖨️</span><div><strong>A4 8-Photo Print Sheet</strong><small>Cyber Cafe Print Ready</small></div>
+      </button>
+      <button class="side-btn" data-keys="age calculator government jobs percentage cgpa" onclick="switchTool('calcTool', this)">
+        <span class="s-icon">🧮</span><div><strong>Age &amp; % / CGPA Calc</strong><small>Exact Age as on Cutoff</small></div>
+      </button>
+    </aside>
+
+    <!-- RIGHT STUDIO WORKSPACE -->
+    <section class="studio-box">
+      <div class="top-utility-bar">
+        <div id="activeModeBanner" class="mode-strip">Mode: <strong>SSC / Railway (Photo 20-50KB)</strong></div>
+        <div class="renamer-box">
+          <span>🏷️ Auto-Rename:</span>
+          <input type="text" id="filePrefix" placeholder="Candidate Name (e.g. Rahul)" title="Files will download as Rahul_Photo.jpg">
+        </div>
+      </div>
+
+      <!-- 1. PHOTO SIZE REDUCER -->
+      <div id="photoTool" class="tool-view active">
+        <h2>📸 Photo Size Reducer in KB (20KB, 50KB, 100KB)</h2>
+        <p class="desc">Resize photo with exact KB, pixel dimensions, and optional Name + Date strip.</p>
+        <div class="grid-3">
+          <div>
+            <label>Target Size Preset:</label>
+            <select id="examPreset" onchange="toggleCustomKB('examPreset', 'customPhotoKBBox')">
+              <option value="48" selected>SSC / Railway / Police (Max 50 KB)</option>
+              <option value="19">Small Photo Preset (Max 20 KB)</option>
+              <option value="45">Banking IBPS / SBI (20–50 KB)</option>
+              <option value="45">Bihar / UP / State Boards (Max 50 KB)</option>
+              <option value="38">CBSE / ICSE Board (Max 40 KB)</option>
+              <option value="95">UPSC / BPSC / NEET (Max 100 KB)</option>
+              <option value="custom">✏️ Custom KB</option>
+            </select>
+          </div>
+          <div>
+            <label>Dimensions (Width × Height):</label>
+            <select id="photoDim">
+              <option value="200x230" selected>200 × 230 px (Banking / SSC)</option>
+              <option value="350x450">350 × 450 px (Passport 3.5×4.5cm)</option>
+              <option value="original">Keep Original Ratio</option>
+            </select>
+          </div>
+          <div id="customPhotoKBBox" style="display:none;">
+            <label>Enter Max KB:</label>
+            <input type="number" id="customPhotoKB" placeholder="e.g. 35" min="5" max="500">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div><label>Name on Photo (Optional):</label><input type="text" id="pName" placeholder="e.g. RAHUL KUMAR"></div>
+          <div><label>Date of Photo / DOP (Optional):</label><input type="text" id="pDate" placeholder="e.g. 25-11-2026"></div>
+        </div>
+        <label class="drop-box" for="pFile">
+          <span class="up-emoji">📤</span>
+          <strong id="pFileLabel">Click or Drop Photo Here (JPG, PNG, WEBP)</strong>
+          <input type="file" id="pFile" accept="image/*" onchange="updateLabel('pFile','pFileLabel')">
+        </label>
+        <button class="run-btn" onclick="makeExamPhoto()">⚡ Resize Photo Now</button>
+
+        <!-- PRO RESULT CARD WITH PORTAL PREVIEW & RESET -->
+        <div id="pResult" class="pro-result-card">
+          <div class="res-left">
+            <span class="portal-tag">Mock Portal Preview</span>
+            <img id="pPreview" alt="Resized Photo">
+          </div>
+          <div class="res-right">
+            <div id="pStatus" class="ok-msg"></div>
+            <div class="check-pills"><span>✅ Format: JPG</span><span>✅ Size Verified</span></div>
+            <div class="btn-row">
+              <a id="pDownload" download="QuickKB-Photo.jpg"><button class="save-btn">⬇ Download JPG</button></a>
+              <button class="wa-btn" onclick="shareToWhatsApp('Exam Photo')">📲 Share</button>
+              <button class="reset-btn" onclick="resetTool('pFile','pFileLabel','pResult')">🔄 Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. SIGNATURE RESIZER -->
+      <div id="signTool" class="tool-view">
+        <h2>✍️ Signature Resizer (10KB to 20KB) &amp; White Cleaner</h2>
+        <p class="desc">Clean dark paper background into pure white and compress under 20KB.</p>
+        <div class="grid-2">
+          <div>
+            <label>Target Size:</label>
+            <select id="sPreset" onchange="toggleCustomKB('sPreset', 'customSignKBBox')">
+              <option value="19" selected>SSC / Banking / State Boards (Max 20 KB)</option>
+              <option value="28">NTA / NEET / JEE / ICSE (Max 30 KB)</option>
+              <option value="38">CBSE / BPSC (Max 40 KB)</option>
+              <option value="custom">✏️ Custom KB</option>
+            </select>
+          </div>
+          <div>
+            <label>Background Cleaner:</label>
+            <select id="sFilter">
+              <option value="clean" selected>Auto White Paper Clean (Best)</option>
+              <option value="normal">Keep Original Color</option>
+            </select>
+          </div>
+        </div>
+        <div id="customSignKBBox" style="display:none; margin-bottom:12px;">
+          <label>Enter Max KB:</label><input type="number" id="customSignKB" placeholder="e.g. 15" min="5" max="300">
+        </div>
+        <label class="drop-box" for="sFile">
+          <span class="up-emoji">✒️</span><strong id="sFileLabel">Click to Upload Signature Photo</strong>
+          <input type="file" id="sFile" accept="image/*" onchange="updateLabel('sFile','sFileLabel')">
+        </label>
+        <button class="run-btn" onclick="makeSignature()">✨ Clean &amp; Resize Signature</button>
+        <div id="sResult" class="pro-result-card">
+          <div class="res-left"><span class="portal-tag">Signature Preview</span><img id="sPreview"></div>
+          <div class="res-right">
+            <div id="sStatus" class="ok-msg"></div>
+            <div class="btn-row">
+              <a id="sDownload" download="QuickKB-Sign.jpg"><button class="save-btn">⬇ Download JPG</button></a>
+              <button class="reset-btn" onclick="resetTool('sFile','sFileLabel','sResult')">🔄 Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. COMPRESS PDF -->
+      <div id="compressPdfTool" class="tool-view">
+        <h2>📉 Compress PDF Under 100KB / 200KB</h2>
+        <p class="desc">Reduce large scanned marksheet or certificate PDFs without losing readability.</p>
+        <label>Compression Strength:</label>
+        <select id="pdfCompLevel">
+          <option value="0.45" selected>Strong Compression (Best for &lt;150 KB)</option>
+          <option value="0.65">Medium Compression (Balanced)</option>
+          <option value="0.82">Light Compression (High Clarity)</option>
+        </select>
+        <label class="drop-box" for="compPdfFile" style="margin-top:12px;">
+          <span class="up-emoji">📉</span><strong id="compPdfLabel">Select PDF File to Compress</strong>
+          <input type="file" id="compPdfFile" accept="application/pdf" onchange="updateLabel('compPdfFile','compPdfLabel')">
+        </label>
+        <button class="run-btn" onclick="compressRealPDF()">📉 Compress &amp; Download PDF</button>
+        <div id="compPdfStatus" class="ok-msg" style="margin-top:12px; text-align:center;"></div>
+      </div>
+
+      <!-- 4. FRONT + BACK ID JOINER -->
+      <div id="idJoinTool" class="tool-view">
+        <h2>🪪 Aadhar / ID Card Front &amp; Back on 1 Page</h2>
+        <p class="desc">Merge Front and Back sides of any ID card onto one clean printable page or PDF.</p>
+        <div class="grid-2">
+          <label class="drop-box" for="idFront"><span class="up-emoji">🪪</span><strong id="idFrontLabel">1. Front Side</strong><input type="file" id="idFront" accept="image/*" onchange="updateLabel('idFront','idFrontLabel')"></label>
+          <label class="drop-box" for="idBack"><span class="up-emoji">🔄</span><strong id="idBackLabel">2. Back Side</strong><input type="file" id="idBack" accept="image/*" onchange="updateLabel('idBack','idBackLabel')"></label>
+        </div>
+        <button class="run-btn" onclick="joinFrontBackID()">⚡ Combine Front &amp; Back</button>
+        <div id="idResult" class="pro-result-card">
+          <div class="res-left"><img id="idPreview"></div>
+          <div class="res-right">
+            <div id="idStatus" class="ok-msg"></div>
+            <div class="btn-row">
+              <a id="idDownload" download="QuickKB-ID.jpg"><button class="save-btn">⬇ Download JPG</button></a>
+              <button class="wa-btn" onclick="downloadIDAsPDF()">📄 Save PDF</button>
+              <button class="reset-btn" onclick="resetIDTool()">🔄 Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 5. IMAGES TO PDF -->
+      <div id="pdfTool" class="tool-view">
+        <h2>📄 JPG / Marksheet Images to PDF Converter</h2>
+        <p class="desc">Convert single or multiple document images into one PDF file.</p>
+        <label class="drop-box" for="pdfFiles">
+          <span class="up-emoji">📑</span><strong id="pdfFileLabel">Select 1 or More Images</strong>
+          <input type="file" id="pdfFiles" accept="image/*" multiple onchange="updateMultiLabel('pdfFiles','pdfFileLabel')">
+        </label>
+        <button class="run-btn" onclick="imagesToRealPDF()">📄 Create &amp; Download PDF</button>
+      </div>
+
+      <!-- 6. DOC SCAN + SELF ATTESTED -->
+      <div id="scanTool" class="tool-view">
+        <h2>📃 Document Scanner + "Self-Attested" Stamp</h2>
+        <p class="desc">Enhance mobile camera document photos and optionally add a neat Self-Attested stamp.</p>
+        <div class="grid-2">
+          <div>
+            <label>Filter Mode:</label>
+            <select id="scanMode"><option value="magic" selected>Magic White Enhance</option><option value="bw">Black &amp; White Scan</option></select>
+          </div>
+          <div>
+            <label>Self-Attested Stamp:</label>
+            <select id="attestStamp"><option value="no" selected>No Stamp</option><option value="yes">Add "SELF ATTESTED" + Date</option></select>
+          </div>
+        </div>
+        <label class="drop-box" for="scanFile"><span class="up-emoji">📃</span><strong id="scanLabel">Select Document Photo</strong><input type="file" id="scanFile" accept="image/*" onchange="updateLabel('scanFile','scanLabel')"></label>
+        <button class="run-btn" onclick="scanDocument()">✨ Scan &amp; Apply Stamp</button>
+        <div id="scanResult" class="pro-result-card">
+          <div class="res-left"><img id="scanPreview"></div>
+          <div class="res-right"><div id="scanStatus" class="ok-msg"></div><div class="btn-row"><a id="scanDownload" download="QuickKB-Scanned.jpg"><button class="save-btn">⬇ Download</button></a><button class="reset-btn" onclick="resetTool('scanFile','scanLabel','scanResult')">🔄 Reset</button></div></div>
+        </div>
+      </div>
+
+      <!-- 7. ALL-FORMAT CONVERTER -->
+      <div id="convTool" class="tool-view">
+        <h2>🔄 Universal Image Format Converter</h2>
+        <div class="grid-2">
+          <div><label>Target Format:</label><select id="cFormat"><option value="image/jpeg|jpg" selected>JPG</option><option value="image/jpeg|jpeg">JPEG</option><option value="image/png|png">PNG</option><option value="image/webp|webp">WEBP</option><option value="image/bmp|bmp">BMP</option></select></div>
+          <div><label>Quality:</label><select id="cQuality"><option value="0.95" selected>High (95%)</option><option value="0.75">Medium (75%)</option></select></div>
+        </div>
+        <label class="drop-box" for="cFile"><span class="up-emoji">🖼️</span><strong id="cFileLabel">Select Image</strong><input type="file" id="cFile" accept="image/*" onchange="updateLabel('cFile','cFileLabel')"></label>
+        <button class="run-btn" onclick="convertImg()">🔄 Convert Now</button>
+        <div id="cResult" class="pro-result-card"><div class="res-left"><img id="cPreview"></div><div class="res-right"><div id="cStatus" class="ok-msg"></div><div class="btn-row"><a id="cDownload" download="converted.jpg"><button class="save-btn">⬇ Download</button></a><button class="reset-btn" onclick="resetTool('cFile','cFileLabel','cResult')">🔄 Reset</button></div></div></div>
+      </div>
+
+      <!-- 8. PDF TO JPG -->
+      <div id="pdfToImgTool" class="tool-view">
+        <h2>🖼️ PDF to JPG / PNG Extractor</h2>
+        <select id="pdfImgFormat"><option value="image/jpeg|jpg" selected>JPG (.jpg)</option><option value="image/png|png">PNG (.png)</option></select>
+        <label class="drop-box" for="pdfToImgFile" style="margin-top:12px;"><span class="up-emoji">📄</span><strong id="pdfToImgLabel">Select PDF File</strong><input type="file" id="pdfToImgFile" accept="application/pdf" onchange="updateLabel('pdfToImgFile','pdfToImgLabel')"></label>
+        <button class="run-btn" onclick="convertPdfToImages()">🖼️ Extract Pages</button>
+        <div id="pdfPagesOutput" class="pdf-pages-grid"></div>
+      </div>
+
+      <!-- 9. MERGE / SPLIT / ROTATE PDF -->
+      <div id="pdfOrganizeTool" class="tool-view">
+        <h2>📑 Merge, Split &amp; Rotate PDF</h2>
+        <div class="sub-card"><h4>1. Merge PDFs</h4><input type="file" id="mergeFiles" accept="application/pdf" multiple style="margin:8px 0;"><button class="run-btn" onclick="mergeRealPDFs()">🔗 Merge PDFs</button></div>
+        <div class="sub-card" style="margin-top:12px;"><h4>2. Extract Page &amp; Rotate</h4><div class="grid-2" style="margin-top:8px;"><div><label>Page No (0=All):</label><input type="number" id="splitPageNum" value="0" min="0"></div><div><label>Rotate:</label><select id="rotAngle"><option value="0" selected>0°</option><option value="90">90°</option><option value="180">180°</option></select></div></div><input type="file" id="rotFile" accept="application/pdf" style="margin:8px 0;"><button class="run-btn" onclick="processAdvancedPDF()">⚡ Process PDF</button></div>
+      </div>
+
+      <!-- 10. A4 PRINT SHEET -->
+      <div id="sheetTool" class="tool-view">
+        <h2>🖨️ A4 Passport Photo Sheet (8 Photos)</h2>
+        <label class="drop-box" for="sheetFile"><span class="up-emoji">🖨️</span><strong id="sheetFileLabel">Select Passport Photo</strong><input type="file" id="sheetFile" accept="image/*" onchange="updateLabel('sheetFile','sheetFileLabel')"></label>
+        <button class="run-btn" onclick="makeA4Sheet()">⚡ Generate Print Sheet</button>
+        <div id="sheetResult" class="pro-result-card"><div class="res-left"><img id="sheetPreview"></div><div class="res-right"><div id="sheetStatus" class="ok-msg"></div><a id="sheetDownload" download="A4-Sheet.jpg"><button class="save-btn">⬇ Download Sheet</button></a></div></div>
+      </div>
+
+      <!-- 11. AGE & PERCENTAGE CALCULATOR -->
+      <div id="calcTool" class="tool-view">
+        <h2>🧮 Age Calculator &amp; Board Percentage</h2>
+        <div class="sub-card"><h4>1. Exact Age Calculator</h4><div class="grid-2" style="margin-top:8px;"><div><label>DOB:</label><input type="date" id="dobInput"></div><div><label>As on Date:</label><input type="date" id="cutoffInput" value="2026-08-01"></div></div><button class="run-btn" onclick="calculateExactAge()">📅 Calculate Age</button><div id="ageResult" class="ok-msg" style="margin-top:10px; text-align:center;"></div></div>
+        <div class="sub-card" style="margin-top:12px;"><h4>2. Board % &amp; CGPA</h4><div class="grid-2" style="margin-top:8px;"><div><label>Obtained:</label><input type="number" id="obtMarks" placeholder="442"></div><div><label>Max Marks:</label><input type="number" id="maxMarks" placeholder="500"></div></div><button class="run-btn" onclick="calcPercent()">🧮 Calculate %</button><div id="calcStatus" class="ok-msg" style="margin-top:10px; text-align:center;"></div></div>
+      </div>
+
+      <div id="recentHistoryBox" class="recent-bar" style="display:none;"><strong>🕒 Recent Files:</strong><div id="recentList" class="recent-chips"></div></div>
+    </section>
+  </main>
+  <section class="info-container">
+    <div class="rating-strip">
+      <span>Rate <strong class="brand-name">QuickKB</strong>:</span>
+      <div class="stars" onclick="rateSite()">⭐⭐⭐⭐⭐</div>
+      <span id="ratingText"><strong>4.9 / 5</strong> (18,420+ Students &amp; Cyber Cafes)</span>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card"><span class="step-num">1</span><h4>Select Exam or File</h4><p>Choose SSC, Banking, State Board, CBSE, or upload any JPG/PNG/PDF.</p></div>
+      <div class="step-card"><span class="step-num">2</span><h4>Instant Browser Fix</h4><p>Exact KB, pixels, white background, or PDF compression runs locally in 1 second.</p></div>
+      <div class="step-card"><span class="step-num">3</span><h4>Download &amp; Share</h4><p>Get portal-ready renamed files or send directly via WhatsApp.</p></div>
+    </div>
+    <div class="faq-box">
+      <h3>Frequently Asked Questions (FAQs)</h3>
+      <details open><summary>How to reduce photo size in KB (20KB or 50KB) without losing quality?</summary><p>Upload your photo in our Photo Resizer tool, select 20KB or 50KB preset, and click Resize.</p></details>
+      <details><summary>Are my photos, Aadhar card, and marksheets safe?</summary><p>Yes, 100% safe. QuickKB processes all files directly inside your browser (Client-Side).</p></details>
+      <details><summary>How to merge Aadhar card front and back on one page?</summary><p>Open the Front + Back ID Joiner tool, upload both sides, and download a single combined JPG or PDF.</p></details>
+    </div>
+        <div class="guides-section" style="margin-top:24px;">
+      <h3 style="margin-bottom:12px; font-size:18px;">📚 Exam Form &amp; Document Guides (2026)</h3>
+      <div class="steps-grid">
+        <div class="step-card" style="cursor:pointer;" onclick="openArticle('art1')">
+          <span class="step-num">📖</span>
+          <h4>SSC &amp; Railway Photo/Sign Rules</h4>
+          <p>Avoid form rejection: Exact 20KB–50KB photo, 200×230px dimensions &amp; signature tips. <strong>Read Guide →</strong></p>
+        </div>
+        <div class="step-card" style="cursor:pointer;" onclick="openArticle('art2')">
+          <span class="step-num">📖</span>
+          <h4>Compress Marksheet PDF Under 150KB</h4>
+          <p>How to reduce 10th/12th marksheet &amp; caste certificate PDFs without losing text clarity. <strong>Read Guide →</strong></p>
+        </div>
+        <div class="step-card" style="cursor:pointer;" onclick="openArticle('art3')">
+          <span class="step-num">📖</span>
+          <h4>Banking, BPSC &amp; Board 4-Doc Checklist</h4>
+          <p>Complete guide for IBPS thumb impression, handwritten declaration, CBSE DOP &amp; Aadhar joiner. <strong>Read Guide →</strong></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="pro-footer">
+    <div class="footer-grid">
+      <div><div class="brand" style="color:#fff; margin-bottom:8px;">⚡ <span class="brand-name">QuickKB</span></div><p style="font-size:13px; color:#94a3b8;">Fast, private, browser-based document tools for Indian students &amp; cyber cafes.</p></div>
+      <div><h4>Popular Tools</h4><button onclick="switchTool('photoTool', null)">Photo Reducer 20KB–50KB</button><button onclick="switchTool('signTool', null)">Signature Resizer 10–20KB</button><button onclick="switchTool('compressPdfTool', null)">Compress PDF Under 150KB</button></div>
+      <div><h4>Student Utilities</h4><button onclick="switchTool('idJoinTool', null)">Front + Back ID Joiner</button><button onclick="switchTool('scanTool', null)">Self-Attested Doc Scanner</button><button onclick="switchTool('calcTool', null)">Govt Job Age Calculator</button></div>
+      <div><h4>Company &amp; Legal</h4><button onclick="openInfoModal('about')">About Us</button><button onclick="openInfoModal('privacy')">Privacy Policy</button><button onclick="openInfoModal('disclaimer')">Disclaimer</button><button onclick="openInfoModal('contact')">Contact Support</button></div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 <span class="brand-name">QuickKB</span>. All rights reserved. 100% Client-Side Privacy.</div>
+  </footer>
+
+  <div id="aiHelperBox" class="ai-chat-box">
+    <div class="ai-header"><span>🤖 <span class="brand-name">QuickKB</span> Smart Helper</span><button onclick="toggleAssistant()">✕</button></div>
+    <div id="aiMessages" class="ai-body">
+      <div class="bot-msg">Hi! Need help with photo/PDF rules? Tap a quick topic or ask below:</div>
+      <div class="ai-chips">
+        <button onclick="askBot('ssc')">SSC / Railway Rule?</button>
+        <button onclick="askBot('banking')">Banking IBPS/SBI?</button>
+        <button onclick="askBot('cbse')">CBSE / Board Rule?</button>
+        <button onclick="askBot('aadhar')">Front+Back Aadhar?</button>
+      </div>
+    </div>
+    <div class="ai-input-row"><input type="text" id="aiUserInput" placeholder="Ask about 20KB, PDF, Age..." onkeypress="if(event.key==='Enter') handleUserAsk()"><button onclick="handleUserAsk()">Send</button></div>
+  </div>
+
+  <div id="infoModal" class="info-overlay" onclick="if(event.target.id==='infoModal') this.style.display='none'">
+    <div class="info-box"><button class="info-close" onclick="document.getElementById('infoModal').style.display='none'">✕</button><div id="infoContent"></div></div>
+  </div>
+
+  <script src="rules.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
