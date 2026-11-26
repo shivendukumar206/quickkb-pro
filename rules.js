@@ -1,24 +1,24 @@
 // ==========================================
-// 1. CENTRAL BRAND CONFIG (EDIT ANYTIME!)
+// 1. CENTRAL BRAND CONFIG
 // ==========================================
 const SITE_CONFIG = {
-  name: "QuickKB", // Kal ko naam badalna ho toh bas yahan change karein!
+  name: "QuickKB",
   supportEmail: "quickkb.help@gmail.com"
 };
 
-// Apply Brand Name Automatically Across Entire Site
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".brand-name").forEach(el => el.innerText = SITE_CONFIG.name);
   renderAlerts();
 });
 
 // ==========================================
-// 2. LIVE FORM SIZE ALERTS (BELL ICON FEED)
+// 2. LIVE 2026 EXAM ALERTS (BELL ICON)
 // ==========================================
 const EXAM_ALERTS = [
-  { id: "a1", title: "SSC & Railway Forms 2026", desc: "Photo: 20-50 KB (200x230px), Sign: 10-20 KB. Click to apply!", pKB: 48, sKB: 19, w: 200, h: 230 },
-  { id: "a2", title: "Banking (IBPS / SBI) Rules", desc: "Photo <50KB, Sign <20KB + Left Thumb & Declaration.", pKB: 45, sKB: 19, w: 200, h: 230 },
-  { id: "a3", title: "CBSE / ICSE & State Boards", desc: "CBSE requires Name + Date on photo (<40KB).", pKB: 38, sKB: 38, w: 350, h: 450 }
+  { title: "SSC / Railway 2026 Rules", desc: "Photo: 20-50KB (200x230px), Sign: 10-20KB.", pKB: 48, sKB: 19, w: 200, h: 230 },
+  { title: "High Court / Civil Judge / Clerk", desc: "Photo <50KB, Sign <20KB + Left Thumb.", pKB: 45, sKB: 19, w: 250, h: 250 },
+  { title: "JEE / NEET / CUET / UG-PG", desc: "Photo 10-100KB (3.5x4.5cm), Sign <30KB.", pKB: 95, sKB: 28, w: 350, h: 450 },
+  { title: "Banking (IBPS / SBI) 4-Doc Kit", desc: "Photo <50KB, Sign <20KB, Thumb <50KB, Decl <100KB.", pKB: 45, sKB: 19, w: 200, h: 230 }
 ];
 
 function renderAlerts() {
@@ -51,7 +51,7 @@ function applyAlertPreset(pKB, sKB, w, h, title) {
 }
 
 // ==========================================
-// 3. SMART ASSISTANT & LEGAL PAGES DATA
+// 3. SMART EXAM AI HELPER (WITH GOOGLE FALLBACK)
 // ==========================================
 function toggleAssistant() {
   const box = document.getElementById("aiHelperBox");
@@ -60,15 +60,15 @@ function toggleAssistant() {
 
 function askBot(topic) {
   const replies = {
-    ssc: "📌 <strong>SSC / Railway:</strong> Photo 20–50 KB (200×230 px) &amp; Sign 10–20 KB in JPG. Preset applied!",
-    banking: "📌 <strong>Banking (IBPS/SBI):</strong> Photo <50KB, Sign <20KB, Left Thumb <50KB &amp; Declaration <100KB.",
-    cbse: "📌 <strong>CBSE / State Boards:</strong> Photo &amp; Sign under 40KB (JPG) with Name &amp; DOP strip. Preset applied!",
-    aadhar: "📌 <strong>Front + Back ID:</strong> Opened <strong>Front + Back ID Joiner</strong> tool for you!"
+    court: "⚖️ <strong>High Court / Civil Judge:</strong> Photo 20–50KB (white background), Sign 10–20KB, and Left Thumb <50KB. Preset applied!",
+    jee: "🎓 <strong>JEE / NEET / CUET / UG-PG:</strong> Passport Photo 10–100KB (80% face coverage, white background) & Sign 4–30KB. Preset applied!",
+    banking: "🏦 <strong>Banking (IBPS/SBI):</strong> Requires 4 docs—Photo (<50KB), Sign (<20KB), Left Thumb (<50KB) & Declaration (<100KB). Use our Thumb & Decl tab!",
+    height: "📏 <strong>Police / Army / SSC GD Height:</strong> General Male usually requires 165–170 cm (5'5\"–5'7\"). Opened Height & BMI Calculator for you!"
   };
-  if (topic === "ssc") applyExamMode(48, 19, 200, 230, "SSC / Railway", null);
-  if (topic === "banking") applyExamMode(45, 19, 200, 230, "Banking IBPS / SBI", null);
-  if (topic === "cbse") applyExamMode(38, 38, 350, 450, "CBSE / Board", null);
-  if (topic === "aadhar") switchTool("idJoinTool", null);
+  if (topic === "court") applyExamMode(45, 19, 250, 250, "High Court / Civil Judge", null);
+  if (topic === "jee") applyExamMode(95, 28, 350, 450, "JEE / NEET / CUET / UG-PG", null);
+  if (topic === "banking") switchTool("thumbTool", null);
+  if (topic === "height") switchTool("calcTool", null);
 
   const chat = document.getElementById("aiMessages");
   chat.innerHTML += `<div class="bot-msg">${replies[topic]}</div>`;
@@ -77,47 +77,35 @@ function askBot(topic) {
 
 function handleUserAsk() {
   const input = document.getElementById("aiUserInput");
-  const q = input.value.trim().toLowerCase();
-  if (!q) return;
+  const raw = input.value.trim();
+  if (!raw) return;
+  const q = raw.toLowerCase();
   const chat = document.getElementById("aiMessages");
-  chat.innerHTML += `<div class="user-msg">${input.value}</div>`;
+
+  const uDiv = document.createElement("div");
+  uDiv.className = "user-msg";
+  uDiv.textContent = raw;
+  chat.appendChild(uDiv);
   input.value = "";
 
-  if (q.includes("ssc") || q.includes("rail")) return askBot("ssc");
-  if (q.includes("bank") || q.includes("ibps")) return askBot("banking");
-  if (q.includes("cbse") || q.includes("bihar") || q.includes("board")) return askBot("cbse");
-  if (q.includes("aadhar") || q.includes("id")) return askBot("aadhar");
+  if (q.includes("court") || q.includes("judge")) return askBot("court");
+  if (q.includes("jee") || q.includes("neet") || q.includes("cuet") || q.includes("ug") || q.includes("pg")) return askBot("jee");
+  if (q.includes("bank") || q.includes("thumb") || q.includes("decl")) return askBot("banking");
+  if (q.includes("height") || q.includes("army") || q.includes("police") || q.includes("bmi")) return askBot("height");
 
-  let ans = "Select any tool from the menu! Use 'Custom KB' inside Photo or Signature Resizer for exact custom sizes.";
-  if (q.includes("age")) { switchTool("calcTool", null); ans = "Opened the Government Job Age Calculator!"; }
-  if (q.includes("pdf")) { switchTool("compressPdfTool", null); ans = "Opened the PDF Compressor (<150KB) tool!"; }
-
-  chat.innerHTML += `<div class="bot-msg">${ans}</div>`;
+  const googleUrl = `https://google.com{encodeURIComponent(raw + " official exam form photo size rule")}`;
+  chat.innerHTML += `<div class="bot-msg">Use our left menu tools for instant KB/MB resize, PDF compression, or HD scanning. For specific official PDF notifications: <br><a href="${googleUrl}" target="_blank" style="color:#2563eb;font-weight:700;">🔍 Search Official Rule on Google →</a></div>`;
   chat.scrollTop = chat.scrollHeight;
 }
 
-function openInfoModal(type) {
-  const n = SITE_CONFIG.name;
-  const data = {
-    about: `<h3>About ${n}</h3><p>${n} is a free, ultra-fast browser utility platform designed for students and cyber cafes to resize photos, signatures, ID cards, and PDFs accurately.</p>`,
-    privacy: `<h3>Privacy Policy</h3><p>100% Client-Side Processing: ${n} never uploads or stores your photos, Aadhar cards, or marksheets on any server. Everything happens locally in your browser.</p>`,
-    disclaimer: `<h3>Disclaimer</h3><p>${n} is an independent utility tool and not affiliated with any government board. Always verify exact dimensions in your official exam notification.</p>`,
-    contact: `<h3>Contact Support</h3><p>For feedback, bug reports, or new preset requests, email us at: <strong>${SITE_CONFIG.supportEmail}</strong></p>`
-  };
-  document.getElementById("infoContent").innerHTML = data[type];
-  document.getElementById("infoModal").style.display = "flex";
-}
+// ==========================================
+// 4. 2026 EXAM GUIDE ARTICLES
+// ==========================================
 function openArticle(id) {
   const articles = {
-    art1: `<h3>SSC &amp; Railway Photo and Signature Guidelines 2026</h3>
-      <p style="margin-top:8px;">Thousands of applications get rejected every year due to blurry photos or wrong file sizes. For SSC (CGL, CHSL, GD, MTS) and RRB Railway forms, your passport photograph must be in <strong>JPG/JPEG format between 20 KB and 50 KB</strong> with standard 200×230 pixel dimensions.</p>
-      <p style="margin-top:8px;">Ensure both ears are visible, background is plain white or light grey, and no cap or dark glasses are worn. Your signature must be on white paper in black/blue ink between <strong>10 KB and 20 KB</strong>. Use QuickKB's Signature White Cleaner to remove grey mobile camera shadows automatically.</p>`,
-    art2: `<h3>How to Compress Marksheet PDF Under 150KB Without Losing Quality</h3>
-      <p style="margin-top:8px;">State PSCs (BPSC, UPPSC), scholarship portals, and college admission forms strictly limit PDF uploads to <strong>100 KB or 200 KB</strong>. Scanning documents directly from a mobile camera often creates 2 MB to 5 MB files.</p>
-      <p style="margin-top:8px;">To fix this safely, first enhance your document using QuickKB's Document Scanner filter to whiten the background, then use our <strong>Compress PDF</strong> tool on Strong or Medium mode. Because QuickKB processes everything inside your browser, your sensitive academic records never leave your device.</p>`,
-    art3: `<h3>Banking (IBPS/SBI), BPSC &amp; Board Exam 4-Document Checklist</h3>
-      <p style="margin-top:8px;">Banking exams like IBPS PO, Clerk, and SBI require four separate files: <strong>1) Photograph (20–50 KB)</strong>, <strong>2) Signature (10–20 KB)</strong>, <strong>3) Left Thumb Impression (20–50 KB)</strong>, and <strong>4) Handwritten Declaration (50–100 KB)</strong>.</p>
-      <p style="margin-top:8px;">For CBSE Class 10/12 private and LOC forms, keep photo and signature strictly under <strong>40 KB</strong> with your Name and Date of Photo (DOP) printed clearly at the bottom strip. If a portal asks for both sides of your Aadhar Card, use our Front + Back ID Joiner to merge them onto a single page.</p>`
+    art1: `<h3>SSC, Railway &amp; High Court Photo/Signature Rules 2026</h3><p style="margin-top:8px;">For SSC, RRB Railway, and High Court / Civil Judge recruitment forms, upload a clear passport photo in <strong>JPG format (20 KB – 50 KB)</strong> with plain light background and both ears visible. Signature must be in black/blue ink on white paper between <strong>10 KB – 20 KB</strong>.</p>`,
+    art2: `<h3>JEE, NEET, CUET (UG/PG) &amp; Banking 4-Document Kit</h3><p style="margin-top:8px;">NTA exams (JEE, NEET, CUET) require a recent photograph (10–100 KB) with 80% face visibility without mask, and signature (4–30 KB). Banking IBPS/SBI exams additionally require Left Thumb Impression (20–50 KB) and Handwritten Declaration (50–100 KB).</p>`,
+    art3: `<h3>Police / Army Height Eligibility &amp; Marksheet PDF Rules</h3><p style="margin-top:8px;">For SSC GD, Bihar Police, and Army Agniveer forms, check your exact height in centimeters (e.g., 165 cm / 170 cm) and BMI before applying. Always compress scanned marksheet PDFs under 150 KB–200 KB while keeping roll numbers readable.</p>`
   };
   document.getElementById("infoContent").innerHTML = articles[id];
   document.getElementById("infoModal").style.display = "flex";
