@@ -606,12 +606,20 @@ function setStarRating(stars) {
   spans.forEach((s, idx) => { s.style.color = idx < stars ? '#f59e0b' : '#cbd5e1'; });
   document.getElementById('ratingText').innerHTML = `<strong>${stars}.0 / 5</strong> (${(baseVotes + 1).toLocaleString()}+ Votes — Thanks!)`;
 }
-
 function universalShare(docType) {
   const shareText = `Prepared my ${docType} in exact exam size using ${SITE_CONFIG.name}! Try free: ${window.location.href}`;
   if (navigator.share) {
     navigator.share({ title: SITE_CONFIG.name, text: shareText, url: window.location.href }).catch(() => {});
   } else {
-    window.open(`https://wa.me{encodeURIComponent(shareText)}`, '_blank');
+    alert("Link copied! Share anywhere: " + window.location.href);
   }
 }
+function universalShare(docType) {
+  const shareText = `Prepared my ${docType} in exact exam size using ${SITE_CONFIG.name}! Try free: ${window.location.href}`;
+  if (navigator.share) {
+    navigator.share({ title: SITE_CONFIG.name, text: shareText, url: window.location.href }).catch(() => {});
+  } else {
+    alert("Link copied! Share anywhere: " + window.location.href);
+  }
+}
+
