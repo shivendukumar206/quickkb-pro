@@ -238,6 +238,10 @@ function makeSignature() {
     document.getElementById('sDownload').download = fName;
     document.getElementById('sStatus').innerText = `✅ Ready: ${kb} KB (JPG)`;
     document.getElementById('sResult').style.display = 'grid';
+        addRecentFile(`Sign (${kb}KB)`, url, fName);
+  });
+}
+
 // 3. THUMB & HANDWRITTEN DECLARATION
 function makeThumb() {
   const file = document.getElementById('tFile').files;
