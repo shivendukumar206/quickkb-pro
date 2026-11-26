@@ -93,7 +93,8 @@ function handleUserAsk() {
   if (q.includes("bank") || q.includes("thumb") || q.includes("decl")) return askBot("banking");
   if (q.includes("height") || q.includes("army") || q.includes("police") || q.includes("bmi")) return askBot("height");
 
-  const googleUrl = "https://google.com" + encodeURIComponent(raw + " official exam form photo size rule");
+  const query = encodeURIComponent(raw + " official exam form photo size rule");
+  const googleUrl = "https://google.com" + query;
   chat.innerHTML += `<div class="bot-msg">Use our left menu tools for instant KB/MB resize, PDF compression, or HD scanning. For specific official PDF notifications: <br><a href="${googleUrl}" target="_blank" style="color:#2563eb;font-weight:700;">🔍 Search Official Rule on Google →</a></div>`;
   chat.scrollTop = chat.scrollHeight;
 }
