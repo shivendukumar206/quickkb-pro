@@ -614,12 +614,4 @@ function universalShare(docType) {
     alert("Link copied! Share anywhere: " + window.location.href);
   }
 }
-function universalShare(docType) {
-  const shareText = `Prepared my ${docType} in exact exam size using ${SITE_CONFIG.name}! Try free: ${window.location.href}`;
-  if (navigator.share) {
-    navigator.share({ title: SITE_CONFIG.name, text: shareText, url: window.location.href }).catch(() => {});
-  } else {
-    alert("Link copied! Share anywhere: " + window.location.href);
-  }
-}
 
