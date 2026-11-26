@@ -614,5 +614,5 @@ function universalShare(docType) {
     alert("Link copied! Share anywhere: " + window.location.href);
   }
 }
-}
+
  
