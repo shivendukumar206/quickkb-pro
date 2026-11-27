@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <meta name="theme-color" content="#0f172a">
-  <title>QuickKB Pro - Photo Size Reducer & Increaser (KB/MB), Signature Cleaner & PDF Studio</title>
-  <meta name="description" content="Free online photo size reducer & increaser (20KB, 50KB, 1MB), signature white cleaner, thumb & declaration maker, Aadhar joiner, PDF compressor, age & height calculator for SSC, Banking, Court, JEE, CUET, BPSC & Boards.">
+  <title>QuickKB Pro - Photo Reducer & Increaser (KB/MB), Custom Cropper, Sign Cleaner & PDF Studio</title>
+  <meta name="description" content="Free online photo reducer & increaser (20KB, 50KB, 1MB), interactive custom cropper, signature cleaner, thumb & declaration, Aadhar joiner, PDF tools, age & height calculator for SSC, UPSC, NEET, JEE, CUET, Banking, Court & Boards.">
   <link href="https://googleapis.com" rel="stylesheet">
   <script src="https://unpkg.com"></script>
   <script src="https://cloudflare.com"></script>
@@ -17,7 +17,7 @@
     <div class="top-wrap">
       <div class="brand">⚡ <span class="brand-name">QuickKB</span> <small class="pro-tag">PRO</small></div>
       <div class="search-wrap">
-        <input type="text" id="toolSearch" placeholder="🔍 Search (20KB, MB, JEE, Court, PDF, Height)..." onkeyup="searchTools()">
+        <input type="text" id="toolSearch" placeholder="🔍 Search (20KB, MB, UPSC, NEET, Crop, PDF, Height)..." onkeyup="searchTools()">
       </div>
       <div class="top-actions">
         <button class="bell-btn" onclick="toggleAlerts()" title="Latest Exam Alerts">🔔 <span id="bellBadge" class="badge-dot">4</span></button>
@@ -34,17 +34,17 @@
 
   <header class="hero-banner">
     <div class="hero-inner">
-      <span class="pill-tag">100% PRIVATE • CAMERA + CROP + PRINT • ALL DEVICES</span>
-      <h1>Photo Reducer &amp; Increaser (KB/MB), Sign Cleaner &amp; PDF Studio</h1>
-      <p>Built for SSC, Railway, Banking, High Court/Judge, BPSC, JEE, NEET, CUET, UG/PG &amp; State/CBSE Boards.</p>
+      <span class="pill-tag">100% PRIVATE • CUSTOM CROP + CAMERA + PRINT • ALL DEVICES</span>
+      <h1>Photo Reducer &amp; Increaser (KB/MB), Custom Crop &amp; PDF Studio</h1>
+      <p>Built for SSC, UPSC, NEET, JEE, CUET, Banking, High Court/Judge, BPSC, Police &amp; State/CBSE Boards.</p>
 
       <div class="exam-bar">
         <span class="bar-label">2026 Presets:</span>
         <button class="exam-chip active" onclick="applyExamMode(48, 19, 200, 230, 'SSC / Railway (20-50KB, 200x230px)', this)">SSC / Rly</button>
+        <button class="exam-chip" onclick="applyExamMode(95, 28, 350, 350, 'UPSC / NDA / CDS (20-100KB, 350x350px)', this)">UPSC / NDA</button>
+        <button class="exam-chip" onclick="applyExamMode(95, 28, 350, 450, 'NEET / JEE / CUET / UG-PG (10-100KB)', this)">NEET / JEE / CUET</button>
         <button class="exam-chip" onclick="applyExamMode(45, 19, 200, 230, 'Banking IBPS / SBI (<50KB + Thumb/Decl)', this)">Banking</button>
-        <button class="exam-chip" onclick="applyExamMode(45, 19, 250, 250, 'High Court / Civil Judge / Clerk (<50KB)', this)">Court / Judge</button>
-        <button class="exam-chip" onclick="applyExamMode(95, 28, 350, 450, 'JEE / NEET / CUET / UG-PG (<100KB)', this)">JEE / CUET / UG</button>
-        <button class="exam-chip" onclick="applyExamMode(48, 19, 250, 250, 'BPSC / Police / State Exams (<50KB)', this)">BPSC / Police</button>
+        <button class="exam-chip" onclick="applyExamMode(45, 19, 250, 250, 'High Court / Civil Judge / BPSC (<50KB)', this)">Court / BPSC</button>
         <button class="exam-chip" onclick="applyExamMode(38, 38, 350, 450, 'CBSE / ICSE / State Boards (<40KB + DOP)', this)">CBSE / Boards</button>
       </div>
     </div>
@@ -53,11 +53,11 @@
   <main class="app-container">
     <aside class="tools-sidebar" id="sidebarMenu">
       <div class="side-title">PHOTO &amp; EXAM TOOLS</div>
-      <button class="side-btn active" data-keys="photo reducer increaser kb mb custom crop camera hindi" onclick="switchTool('photoTool', this)">
-        <span class="s-icon">📸</span><div><strong>Photo Reducer / Increaser</strong><small>KB &amp; MB + Custom Crop</small></div>
+      <button class="side-btn active" data-keys="photo reducer increaser kb mb custom crop camera hindi upsc neet" onclick="switchTool('photoTool', this)">
+        <span class="s-icon">📸</span><div><strong>Photo Reducer / Increaser</strong><small>KB/MB + Custom Crop</small></div>
       </button>
       <button class="side-btn" data-keys="signature sign white background cleaner crop" onclick="switchTool('signTool', this)">
-        <span class="s-icon">✍️</span><div><strong>Signature White Cleaner</strong><small>10-20KB + Clean Paper</small></div>
+        <span class="s-icon">✍️</span><div><strong>Signature White Cleaner</strong><small>10-20KB + Custom Crop</small></div>
       </button>
       <button class="side-btn" data-keys="thumb impression handwritten declaration banking ibps" onclick="switchTool('thumbTool', this)">
         <span class="s-icon">👍</span><div><strong>Thumb &amp; Declaration</strong><small>Banking / NTA Kit</small></div>
@@ -88,8 +88,8 @@
       <button class="side-btn" data-keys="merge split rotate custom angle pdf" onclick="switchTool('pdfOrganizeTool', this)">
         <span class="s-icon">📑</span><div><strong>Merge / Split / Rotate</strong><small>Custom Angle &amp; Pages</small></div>
       </button>
-      <button class="side-btn" data-keys="age height bmi percentage cgpa calculator police army" onclick="switchTool('calcTool', this)">
-        <span class="s-icon">🧮</span><div><strong>Age, Height &amp; % Calc</strong><small>Govt Exam Eligibility</small></div>
+      <button class="side-btn" data-keys="age height feet cm bmi percentage cgpa marks calculator" onclick="switchTool('calcTool', this)">
+        <span class="s-icon">🧮</span><div><strong>Age, Height &amp; % Calc</strong><small>2-Way Govt Eligibility</small></div>
       </button>
     </aside>
     <section class="studio-box">
@@ -104,16 +104,17 @@
       <!-- 1. PHOTO REDUCER & INCREASER -->
       <div id="photoTool" class="tool-view active">
         <h2>📸 Photo Size Reducer &amp; Increaser (KB &amp; MB)</h2>
-        <p class="desc">Reduce under 20KB/50KB OR increase up to 1MB–5MB, set custom pixels, crop &amp; add Hindi/English Name + DOP.</p>
+        <p class="desc">Reduce under 20KB/50KB OR increase up to 1MB–5MB, custom crop, set pixels &amp; add Hindi/English Name + DOP.</p>
         <div class="grid-3">
           <div>
             <label>Size Preset:</label>
             <select id="examPreset" onchange="toggleCustomKB('examPreset', 'customPhotoKBBox')">
               <option value="48" selected>SSC / Railway / Police (Max 50 KB)</option>
+              <option value="95">UPSC / NDA / CDS (Max 100 KB)</option>
+              <option value="95">NEET / JEE / CUET / UG-PG (Max 100 KB)</option>
               <option value="19">Small Photo (Max 20 KB)</option>
               <option value="45">Banking IBPS / SBI (Max 50 KB)</option>
               <option value="45">High Court / Civil Judge (Max 50 KB)</option>
-              <option value="95">JEE / NEET / CUET / UG-PG (Max 100 KB)</option>
               <option value="38">CBSE / ICSE / State Boards (Max 40 KB)</option>
               <option value="custom">✏️ Custom KB / MB (Reduce or Increase)</option>
             </select>
@@ -122,17 +123,18 @@
             <label>Dimensions (W × H):</label>
             <select id="photoDim" onchange="toggleCustomDim()">
               <option value="200x230" selected>200 × 230 px (SSC / Banking)</option>
-              <option value="350x450">350 × 450 px (Passport 3.5×4.5cm)</option>
+              <option value="350x350">350 × 350 px (UPSC Square)</option>
+              <option value="350x450">350 × 450 px (NEET / Passport)</option>
               <option value="original">Keep Original Ratio</option>
               <option value="custom">✏️ Custom Pixels (W × H)</option>
             </select>
           </div>
           <div>
-            <label>Smart Crop Focus:</label>
+            <label>Crop Mode:</label>
             <select id="photoCropFocus">
-              <option value="top" selected>Face / Upper Center Crop</option>
+              <option value="top" selected>Auto Face / Upper Crop</option>
               <option value="center">Exact Center Crop</option>
-              <option value="fit">Full Photo (No Crop / White Pad)</option>
+              <option value="fit">Full Photo (No Crop)</option>
             </select>
           </div>
         </div>
@@ -152,9 +154,10 @@
           <div><label>Date of Photo / DOP (Optional):</label><input type="text" id="pDate" placeholder="e.g. 01-01-2000"></div>
         </div>
 
-        <div class="upload-dual">
-          <label class="drop-box" for="pFile"><span class="up-emoji">📁</span><strong id="pFileLabel">Upload Photo from Device</strong><input type="file" id="pFile" accept="image/*" onchange="updateLabel('pFile','pFileLabel')"></label>
-          <label class="cam-box" for="pCam"><span class="up-emoji">📷</span><strong>Use Camera</strong><input type="file" id="pCam" accept="image/*" capture="user" onchange="syncCamToInput('pCam','pFile','pFileLabel')"></label>
+        <div class="upload-triple">
+          <label class="drop-box" for="pFile"><span class="up-emoji">📁</span><strong id="pFileLabel">Upload Photo</strong><input type="file" id="pFile" accept="image/*" onchange="updateLabel('pFile','pFileLabel')"></label>
+          <label class="cam-box" for="pCam"><span class="up-emoji">📷</span><strong>Camera</strong><input type="file" id="pCam" accept="image/*" capture="user" onchange="syncCamToInput('pCam','pFile','pFileLabel')"></label>
+          <button type="button" class="crop-trigger-btn" onclick="openCustomCropper('pFile','pFileLabel')"><span class="up-emoji">✂️</span><strong>Custom Crop</strong></button>
         </div>
 
         <button class="run-btn" onclick="makeExamPhoto()">⚡ Process &amp; Preview Photo</button>
@@ -175,13 +178,13 @@
       <!-- 2. SIGNATURE CLEANER -->
       <div id="signTool" class="tool-view">
         <h2>✍️ Signature Resizer &amp; White Cleaner</h2>
-        <p class="desc">Clean dark paper shadows into pure white and resize in KB or MB.</p>
+        <p class="desc">Clean dark paper shadows into pure white, custom crop &amp; resize in KB or MB.</p>
         <div class="grid-2">
           <div>
             <label>Target Size:</label>
             <select id="sPreset" onchange="toggleCustomKB('sPreset', 'customSignKBBox')">
               <option value="19" selected>SSC / Banking / Court / Boards (Max 20 KB)</option>
-              <option value="28">JEE / NEET / CUET / ICSE (Max 30 KB)</option>
+              <option value="28">UPSC / NEET / JEE / CUET (Max 30 KB)</option>
               <option value="38">CBSE / BPSC (Max 40 KB)</option>
               <option value="custom">✏️ Custom KB / MB</option>
             </select>
@@ -195,9 +198,10 @@
           <div><label>Target Value:</label><input type="number" id="customSignKB" placeholder="e.g. 15" min="1" max="5000"></div>
           <div><label>Unit:</label><select id="customSignUnit"><option value="KB" selected>KB</option><option value="MB">MB</option></select></div>
         </div>
-        <div class="upload-dual">
+        <div class="upload-triple">
           <label class="drop-box" for="sFile"><span class="up-emoji">✒️</span><strong id="sFileLabel">Upload Signature</strong><input type="file" id="sFile" accept="image/*" onchange="updateLabel('sFile','sFileLabel')"></label>
           <label class="cam-box" for="sCam"><span class="up-emoji">📷</span><strong>Camera</strong><input type="file" id="sCam" accept="image/*" capture="environment" onchange="syncCamToInput('sCam','sFile','sFileLabel')"></label>
+          <button type="button" class="crop-trigger-btn" onclick="openCustomCropper('sFile','sFileLabel')"><span class="up-emoji">✂️</span><strong>Custom Crop</strong></button>
         </div>
         <button class="run-btn" onclick="makeSignature()">✨ Clean &amp; Preview Signature</button>
         <div id="sResult" class="pro-result-card">
@@ -217,16 +221,17 @@
       <!-- 3. THUMB & HANDWRITTEN DECLARATION -->
       <div id="thumbTool" class="tool-view">
         <h2>👍 Thumb Impression &amp; Handwritten Declaration Kit</h2>
-        <p class="desc">Exact compressor for Banking (IBPS/SBI), Court &amp; NTA Left Thumb (20–50KB) &amp; Declaration (50–100KB).</p>
+        <p class="desc">Exact compressor &amp; custom cropper for Banking (IBPS/SBI), Court &amp; NTA Thumb (20–50KB) &amp; Declaration (50–100KB).</p>
         <label>Document Type:</label>
         <select id="tPreset">
           <option value="45" selected>Banking / Court Left Thumb Impression (20–50 KB)</option>
           <option value="95">Banking Handwritten Declaration (50–100 KB)</option>
-          <option value="28">NTA / CUET / State Exam Thumb (Max 30 KB)</option>
+          <option value="28">NTA / NEET / CUET Thumb (Max 30 KB)</option>
         </select>
-        <div class="upload-dual" style="margin-top:12px;">
-          <label class="drop-box" for="tFile"><span class="up-emoji">👍</span><strong id="tFileLabel">Upload Thumb / Declaration</strong><input type="file" id="tFile" accept="image/*" onchange="updateLabel('tFile','tFileLabel')"></label>
+        <div class="upload-triple" style="margin-top:12px;">
+          <label class="drop-box" for="tFile"><span class="up-emoji">👍</span><strong id="tFileLabel">Upload Thumb/Decl</strong><input type="file" id="tFile" accept="image/*" onchange="updateLabel('tFile','tFileLabel')"></label>
           <label class="cam-box" for="tCam"><span class="up-emoji">📷</span><strong>Camera</strong><input type="file" id="tCam" accept="image/*" capture="environment" onchange="syncCamToInput('tCam','tFile','tFileLabel')"></label>
+          <button type="button" class="crop-trigger-btn" onclick="openCustomCropper('tFile','tFileLabel')"><span class="up-emoji">✂️</span><strong>Custom Crop</strong></button>
         </div>
         <button class="run-btn" onclick="makeThumb()">⚡ Process &amp; Preview</button>
         <div id="tResult" class="pro-result-card">
@@ -245,7 +250,7 @@
       <!-- 4. IPHONE NOTES-STYLE HD DOCUMENT SCANNER + SELF-ATTESTED -->
       <div id="scanTool" class="tool-view">
         <h2>📃 iPhone Notes-Style HD Document Scanner + Stamp</h2>
-        <p class="desc">Turn dull phone photos into razor-sharp, bright white scanned documents + optional Self-Attested stamp.</p>
+        <p class="desc">Custom crop edges, turn dull phone photos into crisp white scans + optional Self-Attested stamp.</p>
         <div class="grid-2">
           <div>
             <label>Scan Quality Mode:</label>
@@ -259,9 +264,10 @@
             <select id="attestStamp"><option value="no" selected>No Stamp</option><option value="yes">Add "SELF ATTESTED" + Date</option></select>
           </div>
         </div>
-        <div class="upload-dual">
-          <label class="drop-box" for="scanFile"><span class="up-emoji">📃</span><strong id="scanLabel">Upload Marksheet / Doc</strong><input type="file" id="scanFile" accept="image/*" onchange="updateLabel('scanFile','scanLabel')"></label>
-          <label class="cam-box" for="scanCam"><span class="up-emoji">📷</span><strong>Scan via Camera</strong><input type="file" id="scanCam" accept="image/*" capture="environment" onchange="syncCamToInput('scanCam','scanFile','scanLabel')"></label>
+        <div class="upload-triple">
+          <label class="drop-box" for="scanFile"><span class="up-emoji">📃</span><strong id="scanLabel">Upload Doc</strong><input type="file" id="scanFile" accept="image/*" onchange="updateLabel('scanFile','scanLabel')"></label>
+          <label class="cam-box" for="scanCam"><span class="up-emoji">📷</span><strong>Camera</strong><input type="file" id="scanCam" accept="image/*" capture="environment" onchange="syncCamToInput('scanCam','scanFile','scanLabel')"></label>
+          <button type="button" class="crop-trigger-btn" onclick="openCustomCropper('scanFile','scanLabel')"><span class="up-emoji">✂️</span><strong>Custom Crop</strong></button>
         </div>
         <button class="run-btn" onclick="scanDocument()">✨ HD Scan &amp; Preview</button>
         <div id="scanResult" class="pro-result-card">
@@ -279,10 +285,16 @@
       <!-- 5. FRONT + BACK ID JOINER -->
       <div id="idJoinTool" class="tool-view">
         <h2>🪪 Front + Back ID Card Joiner (1-Page Maker)</h2>
-        <p class="desc">Merge Front and Back sides of Aadhar, Voter ID, or APAAR Card onto one printable page.</p>
+        <p class="desc">Crop &amp; merge Front and Back sides of Aadhar, Voter ID, or APAAR Card onto one printable page.</p>
         <div class="grid-2">
-          <label class="drop-box" for="idFront"><span class="up-emoji">🪪</span><strong id="idFrontLabel">1. Front Side</strong><input type="file" id="idFront" accept="image/*" onchange="updateLabel('idFront','idFrontLabel')"></label>
-          <label class="drop-box" for="idBack"><span class="up-emoji">🔄</span><strong id="idBackLabel">2. Back Side</strong><input type="file" id="idBack" accept="image/*" onchange="updateLabel('idBack','idBackLabel')"></label>
+          <div>
+            <label class="drop-box" for="idFront"><span class="up-emoji">🪪</span><strong id="idFrontLabel">1. Front Side</strong><input type="file" id="idFront" accept="image/*" onchange="updateLabel('idFront','idFrontLabel')"></label>
+            <button type="button" class="mini-crop-btn" onclick="openCustomCropper('idFront','idFrontLabel')">✂️ Crop Front Side</button>
+          </div>
+          <div>
+            <label class="drop-box" for="idBack"><span class="up-emoji">🔄</span><strong id="idBackLabel">2. Back Side</strong><input type="file" id="idBack" accept="image/*" onchange="updateLabel('idBack','idBackLabel')"></label>
+            <button type="button" class="mini-crop-btn" onclick="openCustomCropper('idBack','idBackLabel')">✂️ Crop Back Side</button>
+          </div>
         </div>
         <button class="run-btn" onclick="joinFrontBackID()">⚡ Combine &amp; Preview ID</button>
         <div id="idResult" class="pro-result-card">
@@ -306,7 +318,10 @@
           <div><label>Target Format:</label><select id="cFormat"><option value="image/jpeg|jpg" selected>JPG (.jpg)</option><option value="image/jpeg|jpeg">JPEG (.jpeg)</option><option value="image/png|png">PNG (.png)</option><option value="image/webp|webp">WEBP (.webp)</option><option value="image/bmp|bmp">BMP (.bmp)</option></select></div>
           <div><label>Quality:</label><select id="cQuality"><option value="0.95" selected>High (95%)</option><option value="0.75">Medium (75%)</option></select></div>
         </div>
-        <label class="drop-box" for="cFile"><span class="up-emoji">🖼️</span><strong id="cFileLabel">Select Any Image</strong><input type="file" id="cFile" accept="image/*" onchange="updateLabel('cFile','cFileLabel')"></label>
+        <div class="upload-dual">
+          <label class="drop-box" for="cFile"><span class="up-emoji">🖼️</span><strong id="cFileLabel">Select Any Image</strong><input type="file" id="cFile" accept="image/*" onchange="updateLabel('cFile','cFileLabel')"></label>
+          <button type="button" class="crop-trigger-btn" onclick="openCustomCropper('cFile','cFileLabel')"><span class="up-emoji">✂️</span><strong>Custom Crop</strong></button>
+        </div>
         <button class="run-btn" onclick="convertImg()">🔄 Convert &amp; Preview</button>
         <div id="cResult" class="pro-result-card"><div class="res-left"><img id="cPreview"></div><div class="res-right"><div id="cStatus" class="ok-msg"></div><div class="btn-row"><a id="cDownload" download="converted.jpg"><button class="save-btn">⬇ Download</button></a><button class="print-btn" onclick="printElement('cPreview')">🖨️ Print</button><button class="reset-btn" onclick="resetTool('cFile','cFileLabel','cResult')">🔄 Reset</button></div></div></div>
       </div>
@@ -314,12 +329,15 @@
       <!-- 7. A4 PRINT SHEET -->
       <div id="sheetTool" class="tool-view">
         <h2>🖨️ A4 Passport Photo Sheet (8 Photos)</h2>
-        <label class="drop-box" for="sheetFile"><span class="up-emoji">🖨️</span><strong id="sheetFileLabel">Select Passport Photo</strong><input type="file" id="sheetFile" accept="image/*" onchange="updateLabel('sheetFile','sheetFileLabel')"></label>
+        <div class="upload-dual">
+          <label class="drop-box" for="sheetFile"><span class="up-emoji">🖨️</span><strong id="sheetFileLabel">Select Passport Photo</strong><input type="file" id="sheetFile" accept="image/*" onchange="updateLabel('sheetFile','sheetFileLabel')"></label>
+          <button type="button" class="crop-trigger-btn" onclick="openCustomCropper('sheetFile','sheetFileLabel')"><span class="up-emoji">✂️</span><strong>Custom Crop</strong></button>
+        </div>
         <button class="run-btn" onclick="makeA4Sheet()">⚡ Generate &amp; Preview Sheet</button>
         <div id="sheetResult" class="pro-result-card"><div class="res-left"><img id="sheetPreview"></div><div class="res-right"><div id="sheetStatus" class="ok-msg"></div><div class="btn-row"><a id="sheetDownload" download="A4-Sheet.jpg"><button class="save-btn">⬇ Download</button></a><button class="print-btn" onclick="printElement('sheetPreview')">🖨️ Print Sheet</button></div></div></div>
       </div>
 
-      <!-- 8. COMPRESS PDF (FIXED WITH LIVE PREVIEW & PRINT) -->
+      <!-- 8. COMPRESS PDF -->
       <div id="compressPdfTool" class="tool-view">
         <h2>📉 Compress PDF Size (KB / MB)</h2>
         <p class="desc">Compress large scanned marksheet or certificate PDFs with instant live preview.</p>
@@ -338,7 +356,7 @@
         </div>
       </div>
 
-      <!-- 9. IMAGES TO PDF (FIXED WITH MULTIPLE SELECTION & PREVIEW) -->
+      <!-- 9. IMAGES TO PDF -->
       <div id="pdfTool" class="tool-view">
         <h2>📄 JPG / Marksheet Images to PDF Converter</h2>
         <p class="desc">Select 1 or more images (JPG, PNG, WEBP) to combine into a single PDF.</p>
@@ -350,7 +368,7 @@
           <div class="btn-row" style="margin-top:10px;"><a id="imgPdfDownload" download="QuickKB-Marksheet.pdf"><button class="save-btn">⬇ Download PDF</button></a><button class="print-btn" onclick="printIframe('imgPdfFrame')">🖨️ Print PDF</button></div>
         </div>
       </div>
-      <!-- 10. PDF TO PNG / JPG EXTRACTOR (FIXED) -->
+      <!-- 10. PDF TO PNG / JPG EXTRACTOR -->
       <div id="pdfToImgTool" class="tool-view">
         <h2>🖼️ PDF to PNG / JPG Extractor</h2>
         <select id="pdfImgFormat"><option value="image/png|png" selected>PNG Image (.png)</option><option value="image/jpeg|jpg">JPG Image (.jpg)</option></select>
@@ -383,36 +401,43 @@
         </div>
       </div>
 
-      <!-- 12. AGE, HEIGHT & BOARD % CALCULATOR -->
+      <!-- 12. 2-WAY AGE, HEIGHT & MARKS CALCULATOR -->
       <div id="calcTool" class="tool-view">
-        <h2>🧮 Govt Exam Age, Height &amp; Board % Calculator</h2>
+        <h2>🧮 Govt Exam Age, 2-Way Height &amp; Marks Calculator</h2>
         <div class="sub-card">
-          <h4>1. Exact Age Calculator (As on Exam Cutoff Date)</h4>
+          <h4>1. Exact Age Calculator (Auto Today's Date)</h4>
           <div class="grid-2" style="margin-top:8px;">
             <div><label>Date of Birth:</label><input type="date" id="dobInput"></div>
-            <div><label>Age as on Date:</label><input type="date" id="cutoffInput" value="2026-08-01"></div>
+            <div><label>Age as on Date (Editable):</label><input type="date" id="cutoffInput"></div>
           </div>
           <button class="run-btn" onclick="calculateExactAge()">📅 Calculate Exact Age</button>
           <div id="ageResult" class="ok-msg" style="margin-top:10px; text-align:center;"></div>
         </div>
 
         <div class="sub-card" style="margin-top:12px;">
-          <h4>2. Police / Army / SSC GD Height &amp; BMI Eligibility</h4>
-          <div class="grid-2" style="margin-top:8px;">
-            <div><label>Height in CM (e.g. 170):</label><input type="number" id="heightCm" placeholder="170"></div>
-            <div><label>Weight in KG (Optional):</label><input type="number" id="weightKg" placeholder="62"></div>
+          <h4>2. 2-Way Height Converter (CM ↔ Feet/Inches) &amp; BMI</h4>
+          <div class="grid-3" style="margin-top:8px;">
+            <div><label>Height in CM:</label><input type="number" id="heightCm" placeholder="e.g. 170" oninput="syncHeightFromCm()"></div>
+            <div><label>Feet (ft):</label><input type="number" id="heightFt" placeholder="e.g. 5" oninput="syncHeightFromFt()"></div>
+            <div><label>Inches (in):</label><input type="number" id="heightIn" placeholder="e.g. 7" oninput="syncHeightFromFt()"></div>
           </div>
-          <button class="run-btn" onclick="calculateHeightBMI()">📏 Check Feet/Inches &amp; Eligibility</button>
+          <div style="margin-bottom:10px;"><label>Weight in KG (Optional for BMI):</label><input type="number" id="weightKg" placeholder="e.g. 62"></div>
+          <button class="run-btn" onclick="calculateHeightBMI()">📏 Verify Height &amp; BMI</button>
           <div id="heightResult" class="ok-msg" style="margin-top:10px; text-align:center;"></div>
         </div>
 
         <div class="sub-card" style="margin-top:12px;">
-          <h4>3. Board Marks Percentage &amp; CGPA</h4>
+          <h4>3. 2-Way Board Marks, % &amp; CGPA Calculator</h4>
           <div class="grid-2" style="margin-top:8px;">
-            <div><label>Marks Obtained:</label><input type="number" id="obtMarks" placeholder="442"></div>
-            <div><label>Maximum Marks:</label><input type="number" id="maxMarks" placeholder="500"></div>
+            <div><label>Calculation Mode:</label><select id="marksMode" onchange="toggleMarksMode()"><option value="toPct" selected>Marks Obtained ➔ % &amp; CGPA</option><option value="toMarks">% or CGPA ➔ Exact Marks Obtained</option></select></div>
+            <div><label>Maximum Marks (e.g. 500):</label><input type="number" id="maxMarks" value="500"></div>
           </div>
-          <button class="run-btn" onclick="calcPercent()">🧮 Calculate %</button>
+          <div id="marksInputBox"><label>Marks Obtained:</label><input type="number" id="obtMarks" placeholder="e.g. 442"></div>
+          <div id="pctInputBox" class="grid-2" style="display:none;">
+            <div><label>Enter % OR CGPA:</label><input type="number" id="inPctVal" step="0.01" placeholder="e.g. 85.4 or 9.2"></div>
+            <div><label>Input Type:</label><select id="inPctType"><option value="pct" selected>Percentage (%)</option><option value="cgpa">CGPA (× 9.5)</option></select></div>
+          </div>
+          <button class="run-btn" style="margin-top:10px;" onclick="calcPercent()">🧮 Calculate Now</button>
           <div id="calcStatus" class="ok-msg" style="margin-top:10px; text-align:center;"></div>
         </div>
       </div>
@@ -433,14 +458,14 @@
     <div class="faq-box">
       <h3>Frequently Asked Questions (FAQs)</h3>
       <details open><summary>How to reduce or increase photo size in KB &amp; MB?</summary><p>Open Photo Reducer / Increaser, select Custom KB/MB, enter your exact target (e.g., 20 KB or 2 MB), and download.</p></details>
-      <details><summary>How does the iPhone Notes-style Document Scanner work?</summary><p>It boosts contrast and removes dark camera shadows to create a crisp white scan, with an optional Self-Attested stamp.</p></details>
+      <details><summary>How does the Custom Cropper &amp; iPhone Notes-style Scanner work?</summary><p>Upload any photo and click Custom Crop to trim exact borders, then apply the HD White Scan filter or Self-Attested stamp.</p></details>
     </div>
 
     <div class="guides-section" style="margin-top:20px;">
       <h3 style="margin-bottom:12px; font-size:18px;">📚 2026 Exam &amp; Document Guides</h3>
       <div class="steps-grid">
-        <div class="step-card" style="cursor:pointer;" onclick="openArticle('art1')"><span class="step-num">📖</span><h4>SSC, Railway &amp; Court Photo Rules</h4><p>Exact 20KB–50KB photo, 200×230px &amp; signature guidelines. <strong>Read →</strong></p></div>
-        <div class="step-card" style="cursor:pointer;" onclick="openArticle('art2')"><span class="step-num">📖</span><h4>JEE, CUET &amp; Banking 4-Doc Kit</h4><p>Thumb impression, handwritten declaration &amp; postcard photo rules. <strong>Read →</strong></p></div>
+        <div class="step-card" style="cursor:pointer;" onclick="openArticle('art1')"><span class="step-num">📖</span><h4>SSC, UPSC &amp; High Court Photo Rules</h4><p>Exact 20KB–100KB photo, pixel dimensions &amp; signature rules. <strong>Read →</strong></p></div>
+        <div class="step-card" style="cursor:pointer;" onclick="openArticle('art2')"><span class="step-num">📖</span><h4>NEET, JEE, CUET &amp; Banking 4-Doc Kit</h4><p>Thumb impression, handwritten declaration &amp; postcard photo rules. <strong>Read →</strong></p></div>
         <div class="step-card" style="cursor:pointer;" onclick="openArticle('art3')"><span class="step-num">📖</span><h4>Police / Army Height &amp; PDF Rules</h4><p>Height eligibility in cm/feet and marksheet PDF compression tips. <strong>Read →</strong></p></div>
       </div>
     </div>
@@ -450,20 +475,39 @@
     <div class="footer-grid">
       <div><div class="brand" style="color:#fff; margin-bottom:8px;">⚡ <span class="brand-name">QuickKB</span></div><p style="font-size:13px; color:#94a3b8;">Fast, private document tools for Indian students &amp; cyber cafes.</p></div>
       <div><h4>Popular Tools</h4><button onclick="switchTool('photoTool', null)">Photo Reducer &amp; Increaser</button><button onclick="switchTool('signTool', null)">Signature White Cleaner</button><button onclick="switchTool('thumbTool', null)">Thumb &amp; Declaration Kit</button></div>
-      <div><h4>PDF &amp; Calculators</h4><button onclick="switchTool('compressPdfTool', null)">Compress PDF Size</button><button onclick="switchTool('scanTool', null)">HD Notes-Style Scanner</button><button onclick="switchTool('calcTool', null)">Age, Height &amp; % Calc</button></div>
+      <div><h4>PDF &amp; Calculators</h4><button onclick="switchTool('compressPdfTool', null)">Compress PDF Size</button><button onclick="switchTool('scanTool', null)">HD Notes-Style Scanner</button><button onclick="switchTool('calcTool', null)">2-Way Age, Height &amp; % Calc</button></div>
       <div><h4>Company &amp; Legal</h4><a href="about.html" class="f-link">About Us</a><a href="privacy.html" class="f-link">Privacy Policy</a><a href="contact.html" class="f-link">Contact Support</a></div>
     </div>
     <div class="footer-bottom">&copy; 2026 <span class="brand-name">QuickKB</span>. All rights reserved. 100% Client-Side Privacy.</div>
   </footer>
 
+  <!-- INTERACTIVE CUSTOM CROPPER MODAL -->
+  <div id="cropModal" class="info-overlay">
+    <div class="info-box" style="max-width:560px; text-align:center;">
+      <button class="info-close" onclick="closeCropModal()">✕</button>
+      <h3>✂️ Interactive Custom Image Cropper</h3>
+      <p style="font-size:12.5px; color:#64748b; margin-bottom:10px;">Adjust sliders to trim exact edges from Top, Bottom, Left &amp; Right:</p>
+      <div style="background:#f1f5f9; padding:10px; border-radius:10px; margin-bottom:12px;">
+        <canvas id="cropCanvas" style="max-width:100%; max-height:240px; border:1px solid #94a3b8;"></canvas>
+      </div>
+      <div class="grid-2" style="text-align:left; font-size:12px;">
+        <div><label>Left Trim (%): <span id="lblL">0</span>%</label><input type="range" id="cropL" min="0" max="45" value="0" oninput="drawCropPreview()"></div>
+        <div><label>Right Trim (%): <span id="lblR">0</span>%</label><input type="range" id="cropR" min="0" max="45" value="0" oninput="drawCropPreview()"></div>
+        <div><label>Top Trim (%): <span id="lblT">0</span>%</label><input type="range" id="cropT" min="0" max="45" value="0" oninput="drawCropPreview()"></div>
+        <div><label>Bottom Trim (%): <span id="lblB">0</span>%</label><input type="range" id="cropB" min="0" max="45" value="0" oninput="drawCropPreview()"></div>
+      </div>
+      <button class="run-btn" style="margin-top:10px;" onclick="applyCustomCrop()">✅ Apply Cropped Image</button>
+    </div>
+  </div>
+
   <div id="aiHelperBox" class="ai-chat-box">
     <div class="ai-header"><span>🤖 <span class="brand-name">QuickKB</span> Exam AI Helper</span><button onclick="toggleAssistant()">✕</button></div>
     <div id="aiMessages" class="ai-body">
-      <div class="bot-msg">Ask any exam rule (SSC, Banking, Court, JEE, CUET, Police Height, MB Increaser) or tap below:</div>
+      <div class="bot-msg">Ask any exam rule (UPSC, NEET, SSC, Banking, Court, Police Height) or tap below:</div>
       <div class="ai-chips">
+        <button onclick="askBot('upsc')">UPSC / NDA?</button>
+        <button onclick="askBot('jee')">NEET / JEE / CUET?</button>
         <button onclick="askBot('court')">Court / Judge?</button>
-        <button onclick="askBot('jee')">JEE / CUET?</button>
-        <button onclick="askBot('banking')">Banking 4-Doc?</button>
         <button onclick="askBot('height')">Police Height?</button>
       </div>
     </div>
