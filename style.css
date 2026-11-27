@@ -160,4 +160,9 @@ body.dark-mode input, body.dark-mode select { background: #0f172a; color: #fff; 
   .tools-sidebar { display: flex; overflow-x: auto; gap: 8px; padding: 10px; white-space: nowrap; }
   .side-title { display: none; }
   .side-btn { width: auto; flex-shrink: 0; margin-bottom: 0; padding: 8px 12px; }
-  .side-btn small { display: none; }
+  .side-btn small { display: none; } }
+.upload-triple { display: grid; grid-template-columns: 1fr 110px 120px; gap: 8px; margin-bottom: 16px; }
+.crop-trigger-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed #7c3aed; background: #f5f3ff; color: #5b21b6; padding: 16px 8px; border-radius: 14px; cursor: pointer; font-size: 13px; }
+.crop-trigger-btn:hover { background: #ede9fe; }
+.mini-crop-btn { width: 100%; margin-top: -8px; margin-bottom: 12px; padding: 7px; background: #f5f3ff; border: 1px solid #c4b5fd; color: #5b21b6; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer; }
+@media (max-width: 820px) { .upload-triple { grid-template-columns: 1fr; } }
