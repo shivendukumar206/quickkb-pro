@@ -1,7 +1,6 @@
 if (window.pdfjsLib) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cloudflare.com';
+   pdfjsLib.GlobalWorkerOptions.workerSrc = "https://jsdelivr.net" + "/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
 }
-
 document.addEventListener("DOMContentLoaded", () => {
   const cutoff = document.getElementById("cutoffInput");
   if (cutoff && !cutoff.value) {
@@ -447,8 +446,24 @@ function makeA4Sheet() {
     document.getElementById('sheetResult').style.display = 'grid';
   });
 }
-// 6. FIXED PDF STUDIO (WITH LIVE PREVIEW & SMART SIZE GUARD)
+// 6. UNIVERSAL PDF STUDIO (100% MOBILE & DESKTOP COMPATIBLE)
+function ensurePdfWorker() {
+  if (window.pdfjsLib && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn." + "jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+  }
+}
+
+function readFileAsUint8(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(new Uint8Array(reader.result));
+    reader.onerror = () => reject(new Error("File read failed"));
+    reader.readAsArrayBuffer(file);
+  });
+}
+
 async function compressRealPDF() {
+  ensurePdfWorker();
   const file = document.getElementById('compPdfFile').files.item(0);
   if (!file) return alert("Select a PDF file first!");
   const qual = parseFloat(document.getElementById('pdfCompLevel').value);
@@ -458,26 +473,24 @@ async function compressRealPDF() {
   st.innerText = "⏳ Compressing PDF... Please wait.";
 
   try {
-    const origBytes = await file.arrayBuffer();
+    const origBytes = await readFileAsUint8(file);
     const origKB = Math.round(origBytes.byteLength / 1024);
-    const pdf = await pdfjsLib.getDocument({ data: origBytes.slice(0) }).promise;
-    const { PDFDocument } = PDFLib;
-    const newPdf = await PDFDocument.create();
+    const pdf = await pdfjsLib.getDocument({ data: origBytes.slice() }).promise;
+    const newPdf = await window.PDFLib.PDFDocument.create();
 
     for (let i = 1; i <= pdf.numPages; i++) {
-      st.innerText = `⏳ Processing Page ${i} of ${pdf.numPages}...`;
+      st.innerText = `⏳ Compressing Page ${i} of ${pdf.numPages}...`;
       const page = await pdf.getPage(i);
       const vp = page.getViewport({ scale: 1.1 });
       const canvas = document.createElement('canvas');
       canvas.width = vp.width; canvas.height = vp.height;
       await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-      const jpgBytes = await (await fetch(canvas.toDataURL('image/jpeg', qual))).arrayBuffer();
-      const jpgImg = await newPdf.embedJpg(jpgBytes);
+      const jpgImg = await newPdf.embedJpg(canvas.toDataURL('image/jpeg', qual));
       const np = newPdf.addPage([vp.width, vp.height]);
       np.drawImage(jpgImg, { x: 0, y: 0, width: vp.width, height: vp.height });
     }
     const outBytes = await newPdf.save();
-    const finalBytes = (outBytes.byteLength < origBytes.byteLength) ? outBytes : new Uint8Array(origBytes);
+    const finalBytes = (outBytes.byteLength < origBytes.byteLength) ? outBytes : origBytes;
     const finalKB = Math.round(finalBytes.byteLength / 1024);
     const blobUrl = URL.createObjectURL(new Blob([finalBytes], { type: 'application/pdf' }));
 
@@ -486,7 +499,7 @@ async function compressRealPDF() {
     document.getElementById('compPdfDownload').href = blobUrl;
     document.getElementById('compPdfDownload').download = getFileName("Compressed.pdf");
   } catch (err) {
-    st.innerText = "❌ Error: Password-protected or invalid PDF.";
+    st.innerText = "❌ Error: " + (err.message || "Invalid or locked PDF");
   }
 }
 
@@ -499,8 +512,7 @@ async function imagesToRealPDF() {
   st.innerText = "⏳ Creating PDF...";
 
   try {
-    const { PDFDocument } = PDFLib;
-    const pdfDoc = await PDFDocument.create();
+    const pdfDoc = await window.PDFLib.PDFDocument.create();
     for (let i = 0; i < fileList.length; i++) {
       const f = fileList.item(i);
       await new Promise(resolve => {
@@ -510,8 +522,7 @@ async function imagesToRealPDF() {
           const ctx = canvas.getContext('2d');
           ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0);
-          const jpgBytes = await (await fetch(canvas.toDataURL('image/jpeg', 0.90))).arrayBuffer();
-          const jpgImg = await pdfDoc.embedJpg(jpgBytes);
+          const jpgImg = await pdfDoc.embedJpg(canvas.toDataURL('image/jpeg', 0.90));
           const p = pdfDoc.addPage([jpgImg.width, jpgImg.height]);
           p.drawImage(jpgImg, { x: 0, y: 0, width: jpgImg.width, height: jpgImg.height });
           resolve();
@@ -525,11 +536,11 @@ async function imagesToRealPDF() {
     document.getElementById('imgPdfDownload').href = blobUrl;
     document.getElementById('imgPdfDownload').download = getFileName("Marksheet.pdf");
   } catch (err) {
-    st.innerText = "❌ Could not convert images to PDF.";
+    st.innerText = "❌ Error: " + (err.message || "Could not create PDF");
   }
 }
-
 async function convertPdfToImages() {
+  ensurePdfWorker();
   const file = document.getElementById('pdfToImgFile').files.item(0);
   if (!file) return alert("Select a PDF file!");
   const [mime, ext] = document.getElementById('pdfImgFormat').value.split('|');
@@ -537,7 +548,8 @@ async function convertPdfToImages() {
   outDiv.innerHTML = "<p>⏳ Extracting pages...</p>";
 
   try {
-    const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+    const bytes = await readFileAsUint8(file);
+    const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
     outDiv.innerHTML = "";
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
@@ -549,9 +561,10 @@ async function convertPdfToImages() {
       outDiv.innerHTML += `<div class="page-thumb"><img src="${url}" id="pgImg${i}"><div style="display:flex;gap:4px;justify-content:center;"><a href="${url}" download="Page-${i}.${ext}"><button class="save-btn" style="padding:6px 10px;font-size:12px;">⬇ Save</button></a><button class="print-btn" style="padding:6px 10px;font-size:12px;" onclick="printElement('pgImg${i}')">🖨️</button></div></div>`;
     }
   } catch (err) {
-    outDiv.innerHTML = "<p style='color:red;'>❌ Error reading PDF (Check if password-protected).</p>";
+    outDiv.innerHTML = `<p style='color:red;'>❌ Error: ${err.message || "Locked PDF"}</p>`;
   }
 }
+
 async function mergeRealPDFs() {
   const fileList = document.getElementById('mergeFiles').files;
   if (!fileList || fileList.length < 2) return alert("Select at least 2 PDF files!");
@@ -561,20 +574,20 @@ async function mergeRealPDFs() {
   st.innerText = "⏳ Merging PDFs...";
 
   try {
-    const { PDFDocument } = PDFLib;
-    const merged = await PDFDocument.create();
+    const merged = await window.PDFLib.PDFDocument.create();
     for (let i = 0; i < fileList.length; i++) {
-      const pdf = await PDFDocument.load(await fileList.item(i).arrayBuffer());
+      const bytes = await readFileAsUint8(fileList.item(i));
+      const pdf = await window.PDFLib.PDFDocument.load(bytes);
       (await merged.copyPages(pdf, pdf.getPageIndices())).forEach(p => merged.addPage(p));
     }
-    const bytes = await merged.save();
-    const blobUrl = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
-    st.innerText = `✅ Merged ${fileList.length} PDFs (${Math.round(bytes.byteLength / 1024)} KB)`;
+    const outBytes = await merged.save();
+    const blobUrl = URL.createObjectURL(new Blob([outBytes], { type: 'application/pdf' }));
+    st.innerText = `✅ Merged ${fileList.length} PDFs (${Math.round(outBytes.byteLength / 1024)} KB)`;
     document.getElementById('orgPdfFrame').src = blobUrl;
     document.getElementById('orgPdfDownload').href = blobUrl;
     document.getElementById('orgPdfDownload').download = getFileName("Merged.pdf");
   } catch (err) {
-    st.innerText = "❌ Error merging PDFs.";
+    st.innerText = "❌ Error: " + (err.message || "Could not merge PDFs");
   }
 }
 
@@ -588,20 +601,20 @@ async function processAdvancedPDF() {
   resBox.style.display = 'block';
 
   try {
-    const { PDFDocument, degrees } = PDFLib;
-    const src = await PDFDocument.load(await file.arrayBuffer());
-    const out = await PDFDocument.create();
+    const bytes = await readFileAsUint8(file);
+    const src = await window.PDFLib.PDFDocument.load(bytes);
+    const out = await window.PDFLib.PDFDocument.create();
     if (pg > src.getPageCount()) return alert(`This PDF only has ${src.getPageCount()} pages!`);
     const idx = pg > 0 ? [pg - 1] : src.getPageIndices();
-    (await out.copyPages(src, idx)).forEach(p => { if (ang > 0) p.setRotation(degrees(ang)); out.addPage(p); });
-    const bytes = await out.save();
-    const blobUrl = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
-    st.innerText = `✅ PDF Processed (${Math.round(bytes.byteLength / 1024)} KB)`;
+    (await out.copyPages(src, idx)).forEach(p => { if (ang > 0) p.setRotation(window.PDFLib.degrees(ang)); out.addPage(p); });
+    const outBytes = await out.save();
+    const blobUrl = URL.createObjectURL(new Blob([outBytes], { type: 'application/pdf' }));
+    st.innerText = `✅ PDF Processed (${Math.round(outBytes.byteLength / 1024)} KB)`;
     document.getElementById('orgPdfFrame').src = blobUrl;
     document.getElementById('orgPdfDownload').href = blobUrl;
     document.getElementById('orgPdfDownload').download = getFileName("Edited.pdf");
   } catch (err) {
-    st.innerText = "❌ Error processing PDF.";
+    st.innerText = "❌ Error: " + (err.message || "Could not edit PDF");
   }
 }
 
