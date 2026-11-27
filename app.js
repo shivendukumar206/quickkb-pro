@@ -2,6 +2,13 @@ if (window.pdfjsLib) {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cloudflare.com';
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  const cutoff = document.getElementById("cutoffInput");
+  if (cutoff && !cutoff.value) {
+    cutoff.value = new Date().toLocaleDateString('en-CA');
+  }
+});
+
 function toggleTheme() {
   document.body.classList.toggle('dark-mode');
   document.getElementById('themeBtn').innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
@@ -43,7 +50,6 @@ function toggleCustomKB(selectId, boxId) {
 function toggleCustomDim() {
   document.getElementById('customDimBox').style.display = (document.getElementById('photoDim').value === 'custom') ? 'grid' : 'none';
 }
-
 function getFileName(defaultName) {
   const prefix = document.getElementById('filePrefix').value.trim().replace(/\s+/g, '_');
   return prefix ? `${prefix}_${defaultName}` : `${SITE_CONFIG.name}-${defaultName}`;
@@ -59,17 +65,17 @@ function addRecentFile(label, url, fileName) {
 }
 
 function updateLabel(inputId, textId) {
-  const f = document.getElementById(inputId).files[0];
+  const f = document.getElementById(inputId).files.item(0);
   if (f) document.getElementById(textId).innerText = "✅ Selected: " + f.name;
 }
 
 function syncCamToInput(camId, fileId, labelId) {
-  const camInput = document.getElementById(camId);
-  if (camInput.files && camInput.files[0]) {
+  const camFile = document.getElementById(camId).files.item(0);
+  if (camFile) {
     const dt = new DataTransfer();
-    dt.items.add(camInput.files[0]);
+    dt.items.add(camFile);
     document.getElementById(fileId).files = dt.files;
-    document.getElementById(labelId).innerText = "📷 Captured: " + camInput.files[0].name;
+    document.getElementById(labelId).innerText = "📷 Captured: " + camFile.name;
   }
 }
 
@@ -80,7 +86,7 @@ function updateMultiLabel(inputId, textId) {
 
 function resetTool(inputId, labelId, resultId) {
   document.getElementById(inputId).value = "";
-  document.getElementById(labelId).innerText = "Upload Photo from Device";
+  document.getElementById(labelId).innerText = "Upload File";
   document.getElementById(resultId).style.display = "none";
 }
 
@@ -92,26 +98,75 @@ function resetIDTool() {
   document.getElementById('idResult').style.display = "none";
 }
 
+// INTERACTIVE CUSTOM IMAGE CROPPER
+let activeCropInputId = "", activeCropLabelId = "", cropSourceImg = null;
+
+function openCustomCropper(inputId, labelId) {
+  const file = document.getElementById(inputId).files.item(0);
+  if (!file) return alert("Please upload or capture an image first, then click Custom Crop!");
+  activeCropInputId = inputId;
+  activeCropLabelId = labelId;
+  ['cropL', 'cropR', 'cropT', 'cropB'].forEach(id => document.getElementById(id).value = 0);
+  loadImageFile(file, img => {
+    cropSourceImg = img;
+    document.getElementById('cropModal').style.display = 'flex';
+    drawCropPreview();
+  });
+}
+
+function closeCropModal() {
+  document.getElementById('cropModal').style.display = 'none';
+}
+
+function drawCropPreview() {
+  if (!cropSourceImg) return;
+  const l = parseInt(document.getElementById('cropL').value);
+  const r = parseInt(document.getElementById('cropR').value);
+  const t = parseInt(document.getElementById('cropT').value);
+  const b = parseInt(document.getElementById('cropB').value);
+  document.getElementById('lblL').innerText = l;
+  document.getElementById('lblR').innerText = r;
+  document.getElementById('lblT').innerText = t;
+  document.getElementById('lblB').innerText = b;
+
+  const sx = Math.round(cropSourceImg.width * (l / 100));
+  const sy = Math.round(cropSourceImg.height * (t / 100));
+  const sw = Math.max(20, Math.round(cropSourceImg.width * (1 - (l + r) / 100)));
+  const sh = Math.max(20, Math.round(cropSourceImg.height * (1 - (t + b) / 100)));
+
+  const canvas = document.getElementById('cropCanvas');
+  canvas.width = sw; canvas.height = sh;
+  canvas.getContext('2d').drawImage(cropSourceImg, sx, sy, sw, sh, 0, 0, sw, sh);
+}
+
+function applyCustomCrop() {
+  const canvas = document.getElementById('cropCanvas');
+  canvas.toBlob(blob => {
+    const croppedFile = new File([blob], "cropped_image.jpg", { type: "image/jpeg" });
+    const dt = new DataTransfer();
+    dt.items.add(croppedFile);
+    document.getElementById(activeCropInputId).files = dt.files;
+    document.getElementById(activeCropLabelId).innerText = "✂️ Cropped Ready: cropped_image.jpg";
+    closeCropModal();
+  }, 'image/jpeg', 0.95);
+}
 // TARGET KB / MB SIZE ENGINE (REDUCER + INCREASER)
 function adjustCanvasSize(canvas, targetKB) {
   let q = 0.92;
   let dataUrl = canvas.toDataURL('image/jpeg', q);
   let curKB = (dataUrl.length * 0.75) / 1024;
 
-  // Reduce if larger
   while (curKB > targetKB && q > 0.06) {
     q -= 0.05;
     dataUrl = canvas.toDataURL('image/jpeg', q);
     curKB = (dataUrl.length * 0.75) / 1024;
   }
-  // Increase if smaller (for MB / minimum size rules)
   if (curKB < targetKB * 0.85 && targetKB >= 100) {
     dataUrl = canvas.toDataURL('image/jpeg', 1.0);
     curKB = (dataUrl.length * 0.75) / 1024;
     if (curKB < targetKB) {
       const padBytes = Math.round((targetKB - curKB) * 1024);
-      const padStr = "A".repeat(Math.max(0, padBytes));
-      dataUrl = dataUrl + "#" + padStr;
+      dataUrl = dataUrl + "#" + "A".repeat(Math.max(0, padBytes));
     }
   }
   return dataUrl;
@@ -129,7 +184,7 @@ function loadImageFile(file, callback) {
 
 // 1. PHOTO REDUCER & INCREASER
 async function makeExamPhoto() {
-  const file = document.getElementById('pFile').files[0];
+  const file = document.getElementById('pFile').files.item(0);
   if (!file) return alert("Please upload or capture a photo first!");
 
   const pVal = document.getElementById('examPreset').value;
@@ -200,7 +255,7 @@ async function makeExamPhoto() {
 
 // 2. SIGNATURE CLEANER
 function makeSignature() {
-  const file = document.getElementById('sFile').files[0];
+  const file = document.getElementById('sFile').files.item(0);
   if (!file) return alert("Please upload signature image!");
   const sVal = document.getElementById('sPreset').value;
   let targetKB = parseInt(sVal);
@@ -238,13 +293,12 @@ function makeSignature() {
     document.getElementById('sDownload').download = fName;
     document.getElementById('sStatus').innerText = `✅ Ready: ${kb} KB (JPG)`;
     document.getElementById('sResult').style.display = 'grid';
-        addRecentFile(`Sign (${kb}KB)`, url, fName);
+    addRecentFile(`Sign (${kb}KB)`, url, fName);
   });
 }
-
 // 3. THUMB & HANDWRITTEN DECLARATION
 function makeThumb() {
-  const file = document.getElementById('tFile').files;
+  const file = document.getElementById('tFile').files.item(0);
   if (!file) return alert("Please select thumb/declaration image!");
   const maxKB = parseInt(document.getElementById('tPreset').value);
   loadImageFile(file, img => {
@@ -267,7 +321,7 @@ function makeThumb() {
 
 // 4. IPHONE NOTES-STYLE HD DOCUMENT SCANNER + SELF-ATTESTED STAMP
 function scanDocument() {
-  const file = document.getElementById('scanFile').files;
+  const file = document.getElementById('scanFile').files.item(0);
   if (!file) return alert("Select document image!");
   const mode = document.getElementById('scanMode').value;
   const stamp = document.getElementById('attestStamp').value;
@@ -279,7 +333,6 @@ function scanDocument() {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0, w, h);
 
-    // Pixel-level Notes-style shadow removal & crisp text enhancement
     const imgData = ctx.getImageData(0, 0, w, h);
     const d = imgData.data;
     for (let i = 0; i < d.length; i += 4) {
@@ -319,7 +372,7 @@ function scanDocument() {
 // 5. FRONT + BACK ID JOINER, CONVERTER & A4 SHEET
 let combinedIdUrl = "";
 function joinFrontBackID() {
-  const f1 = document.getElementById('idFront').files, f2 = document.getElementById('idBack').files;
+  const f1 = document.getElementById('idFront').files.item(0), f2 = document.getElementById('idBack').files.item(0);
   if (!f1 || !f2) return alert("Upload both Front & Back images!");
   loadImageFile(f1, img1 => {
     loadImageFile(f2, img2 => {
@@ -329,7 +382,7 @@ function joinFrontBackID() {
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img1, 30, 30, w, h1); ctx.strokeStyle = "#cbd5e1"; ctx.strokeRect(30, 30, w, h1);
-      ctx.drawImage(img2, 30, h1 + 60, w, h2); ctx.strokeRect(30, h1 + 60, w, h2);
+      ctx.drawImage(img2, 30, h1 + 60, w, h2); ctx.strokeStyle = "#cbd5e1"; ctx.strokeRect(30, h1 + 60, w, h2);
       combinedIdUrl = canvas.toDataURL('image/jpeg', 0.9);
       const kb = Math.round((combinedIdUrl.length * 0.75) / 1024);
       document.getElementById('idPreview').src = combinedIdUrl;
@@ -352,7 +405,7 @@ async function downloadIDAsPDF() {
 }
 
 function convertImg() {
-  const file = document.getElementById('cFile').files;
+  const file = document.getElementById('cFile').files.item(0);
   if (!file) return alert("Select image!");
   const [mime, ext] = document.getElementById('cFormat').value.split('|');
   const qual = parseFloat(document.getElementById('cQuality').value);
@@ -373,7 +426,7 @@ function convertImg() {
 }
 
 function makeA4Sheet() {
-  const file = document.getElementById('sheetFile').files;
+  const file = document.getElementById('sheetFile').files.item(0);
   if (!file) return alert("Select passport photo!");
   loadImageFile(file, img => {
     const canvas = document.createElement('canvas');
@@ -394,10 +447,9 @@ function makeA4Sheet() {
     document.getElementById('sheetResult').style.display = 'grid';
   });
 }
-
 // 6. FIXED PDF STUDIO (WITH LIVE PREVIEW & SMART SIZE GUARD)
 async function compressRealPDF() {
-  const file = document.getElementById('compPdfFile').files;
+  const file = document.getElementById('compPdfFile').files.item(0);
   if (!file) return alert("Select a PDF file first!");
   const qual = parseFloat(document.getElementById('pdfCompLevel').value);
   const resBox = document.getElementById('compPdfResult');
@@ -439,8 +491,8 @@ async function compressRealPDF() {
 }
 
 async function imagesToRealPDF() {
-  const files = document.getElementById('pdfFiles').files;
-  if (!files || files.length === 0) return alert("Please select at least 1 image!");
+  const fileList = document.getElementById('pdfFiles').files;
+  if (!fileList || fileList.length === 0) return alert("Please select at least 1 image!");
   const resBox = document.getElementById('imgPdfResult');
   const st = document.getElementById('imgPdfStatus');
   resBox.style.display = 'block';
@@ -449,8 +501,8 @@ async function imagesToRealPDF() {
   try {
     const { PDFDocument } = PDFLib;
     const pdfDoc = await PDFDocument.create();
-    for (let i = 0; i < files.length; i++) {
-      const f = files[i];
+    for (let i = 0; i < fileList.length; i++) {
+      const f = fileList.item(i);
       await new Promise(resolve => {
         loadImageFile(f, async img => {
           const canvas = document.createElement('canvas');
@@ -468,7 +520,7 @@ async function imagesToRealPDF() {
     }
     const pdfBytes = await pdfDoc.save();
     const blobUrl = URL.createObjectURL(new Blob([pdfBytes], { type: 'application/pdf' }));
-    st.innerText = `✅ PDF Ready (${files.length} Page(s), ${Math.round(pdfBytes.byteLength / 1024)} KB)`;
+    st.innerText = `✅ PDF Ready (${fileList.length} Page(s), ${Math.round(pdfBytes.byteLength / 1024)} KB)`;
     document.getElementById('imgPdfFrame').src = blobUrl;
     document.getElementById('imgPdfDownload').href = blobUrl;
     document.getElementById('imgPdfDownload').download = getFileName("Marksheet.pdf");
@@ -478,7 +530,7 @@ async function imagesToRealPDF() {
 }
 
 async function convertPdfToImages() {
-  const file = document.getElementById('pdfToImgFile').files[0];
+  const file = document.getElementById('pdfToImgFile').files.item(0);
   if (!file) return alert("Select a PDF file!");
   const [mime, ext] = document.getElementById('pdfImgFormat').value.split('|');
   const outDiv = document.getElementById('pdfPagesOutput');
@@ -500,10 +552,9 @@ async function convertPdfToImages() {
     outDiv.innerHTML = "<p style='color:red;'>❌ Error reading PDF (Check if password-protected).</p>";
   }
 }
-
 async function mergeRealPDFs() {
-  const files = document.getElementById('mergeFiles').files;
-  if (!files || files.length < 2) return alert("Select at least 2 PDF files!");
+  const fileList = document.getElementById('mergeFiles').files;
+  if (!fileList || fileList.length < 2) return alert("Select at least 2 PDF files!");
   const resBox = document.getElementById('orgPdfResult');
   const st = document.getElementById('orgPdfStatus');
   resBox.style.display = 'block';
@@ -512,13 +563,13 @@ async function mergeRealPDFs() {
   try {
     const { PDFDocument } = PDFLib;
     const merged = await PDFDocument.create();
-    for (let i = 0; i < files.length; i++) {
-      const pdf = await PDFDocument.load(await files[i].arrayBuffer());
+    for (let i = 0; i < fileList.length; i++) {
+      const pdf = await PDFDocument.load(await fileList.item(i).arrayBuffer());
       (await merged.copyPages(pdf, pdf.getPageIndices())).forEach(p => merged.addPage(p));
     }
     const bytes = await merged.save();
     const blobUrl = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
-    st.innerText = `✅ Merged ${files.length} PDFs (${Math.round(bytes.byteLength / 1024)} KB)`;
+    st.innerText = `✅ Merged ${fileList.length} PDFs (${Math.round(bytes.byteLength / 1024)} KB)`;
     document.getElementById('orgPdfFrame').src = blobUrl;
     document.getElementById('orgPdfDownload').href = blobUrl;
     document.getElementById('orgPdfDownload').download = getFileName("Merged.pdf");
@@ -528,7 +579,7 @@ async function mergeRealPDFs() {
 }
 
 async function processAdvancedPDF() {
-  const file = document.getElementById('rotFile').files[0];
+  const file = document.getElementById('rotFile').files.item(0);
   if (!file) return alert("Select a PDF file!");
   const pg = parseInt(document.getElementById('splitPageNum').value) || 0;
   const ang = parseInt(document.getElementById('rotAngle').value) || 0;
@@ -559,6 +610,7 @@ function triggerBlobDownload(bytes, name, mime) {
   const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
 }
 
+// 7. 2-WAY AGE, HEIGHT/BMI & MARKS CALCULATORS
 function calculateExactAge() {
   const d1 = document.getElementById('dobInput').value, d2 = document.getElementById('cutoffInput').value;
   if (!d1 || !d2) return alert("Select both dates!");
@@ -570,14 +622,27 @@ function calculateExactAge() {
   document.getElementById('ageResult').innerText = `✅ Exact Age: ${y} Years, ${m} Months, ${d} Days`;
 }
 
+function syncHeightFromCm() {
+  const cm = parseFloat(document.getElementById('heightCm').value);
+  if (!cm || cm <= 0) { document.getElementById('heightFt').value = ""; document.getElementById('heightIn').value = ""; return; }
+  const totalIn = cm / 2.54;
+  document.getElementById('heightFt').value = Math.floor(totalIn / 12);
+  document.getElementById('heightIn').value = Math.round(totalIn % 12);
+}
+
+function syncHeightFromFt() {
+  const ft = parseFloat(document.getElementById('heightFt').value) || 0;
+  const inc = parseFloat(document.getElementById('heightIn').value) || 0;
+  if (ft <= 0 && inc <= 0) { document.getElementById('heightCm').value = ""; return; }
+  document.getElementById('heightCm').value = ((ft * 12 + inc) * 2.54).toFixed(1);
+}
+
 function calculateHeightBMI() {
   const cm = parseFloat(document.getElementById('heightCm').value);
   const kg = parseFloat(document.getElementById('weightKg').value);
-  if (!cm || cm < 100 || cm > 250) return alert("Enter valid height in CM (e.g. 170)!");
-  const totalInches = cm / 2.54;
-  const feet = Math.floor(totalInches / 12);
-  const inches = Math.round(totalInches % 12);
-  let text = `✅ Height: ${cm} cm = ${feet} Feet ${inches} Inches`;
+  if (!cm || cm < 90 || cm > 250) return alert("Enter valid height in CM or Feet/Inches!");
+  const ft = document.getElementById('heightFt').value, inc = document.getElementById('heightIn').value;
+  let text = `✅ Height: ${cm} cm (${ft} Feet ${inc} Inches)`;
   if (kg && kg > 20) {
     const bmi = (kg / ((cm / 100) ** 2)).toFixed(1);
     text += ` | BMI: ${bmi} (${bmi >= 18.5 && bmi <= 25 ? 'Fit / Normal' : 'Check Chart'})`;
@@ -585,11 +650,30 @@ function calculateHeightBMI() {
   document.getElementById('heightResult').innerText = text;
 }
 
+function toggleMarksMode() {
+  const mode = document.getElementById('marksMode').value;
+  document.getElementById('marksInputBox').style.display = (mode === 'toPct') ? 'block' : 'none';
+  document.getElementById('pctInputBox').style.display = (mode === 'toMarks') ? 'grid' : 'none';
+}
+
 function calcPercent() {
-  const obt = parseFloat(document.getElementById('obtMarks').value), max = parseFloat(document.getElementById('maxMarks').value);
-  if (!obt || !max || obt > max) return alert("Enter valid marks!");
-  const pct = ((obt / max) * 100).toFixed(2);
-  document.getElementById('calcStatus').innerText = `✅ Percentage: ${pct}% | CGPA: ${(pct / 9.5).toFixed(2)}`;
+  const mode = document.getElementById('marksMode').value;
+  const max = parseFloat(document.getElementById('maxMarks').value);
+  if (!max || max <= 0) return alert("Enter valid Maximum Marks!");
+
+  if (mode === 'toPct') {
+    const obt = parseFloat(document.getElementById('obtMarks').value);
+    if (!obt || obt < 0 || obt > max) return alert("Enter valid Marks Obtained!");
+    const pct = ((obt / max) * 100).toFixed(2);
+    document.getElementById('calcStatus').innerText = `✅ Percentage: ${pct}% | CGPA: ${(pct / 9.5).toFixed(2)}`;
+  } else {
+    const val = parseFloat(document.getElementById('inPctVal').value);
+    const type = document.getElementById('inPctType').value;
+    if (!val || val <= 0) return alert("Enter valid Percentage or CGPA!");
+    const pct = (type === 'cgpa') ? (val * 9.5) : val;
+    const obtMarks = Math.round((pct / 100) * max);
+    document.getElementById('calcStatus').innerText = `✅ Exact Marks Obtained: ${obtMarks} / ${max} (${pct.toFixed(2)}%)`;
+  }
 }
 
 function printElement(imgId) {
@@ -610,13 +694,12 @@ function setStarRating(stars) {
   spans.forEach((s, idx) => { s.style.color = idx < stars ? '#f59e0b' : '#cbd5e1'; });
   document.getElementById('ratingText').innerHTML = `<strong>${stars}.0 / 5</strong> (${(baseVotes + 1).toLocaleString()}+ Votes — Thanks!)`;
 }
+
 function universalShare(docType) {
   const shareText = `Prepared my ${docType} in exact exam size using ${SITE_CONFIG.name}! Try free: ${window.location.href}`;
   if (navigator.share) {
     navigator.share({ title: SITE_CONFIG.name, text: shareText, url: window.location.href }).catch(() => {});
-    } else {
+  } else {
     alert("Link copied! Share anywhere: " + window.location.href);
   }
 }
-
- 
