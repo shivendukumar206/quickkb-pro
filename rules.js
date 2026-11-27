@@ -60,11 +60,13 @@ function toggleAssistant() {
 
 function askBot(topic) {
   const replies = {
+    upsc: "🏛️ <strong>UPSC / NDA / CDS:</strong> Passport Photo 20–100 KB (350×350 px, white background) &amp; Sign 20–100 KB in JPG. Preset applied!",
     court: "⚖️ <strong>High Court / Civil Judge:</strong> Photo 20–50KB (white background), Sign 10–20KB, and Left Thumb <50KB. Preset applied!",
     jee: "🎓 <strong>JEE / NEET / CUET / UG-PG:</strong> Passport Photo 10–100KB (80% face coverage, white background) & Sign 4–30KB. Preset applied!",
     banking: "🏦 <strong>Banking (IBPS/SBI):</strong> Requires 4 docs—Photo (<50KB), Sign (<20KB), Left Thumb (<50KB) & Declaration (<100KB). Use our Thumb & Decl tab!",
     height: "📏 <strong>Police / Army / SSC GD Height:</strong> General Male usually requires 165–170 cm (5'5\"–5'7\"). Opened Height & BMI Calculator for you!"
   };
+  if (topic === "upsc") applyExamMode(95, 28, 350, 350, "UPSC / NDA / CDS", null);
   if (topic === "court") applyExamMode(45, 19, 250, 250, "High Court / Civil Judge", null);
   if (topic === "jee") applyExamMode(95, 28, 350, 450, "JEE / NEET / CUET / UG-PG", null);
   if (topic === "banking") switchTool("thumbTool", null);
@@ -87,7 +89,7 @@ function handleUserAsk() {
   uDiv.textContent = raw;
   chat.appendChild(uDiv);
   input.value = "";
-
+  if (q.includes("upsc") || q.includes("nda") || q.includes("cds")) return askBot("upsc");
   if (q.includes("court") || q.includes("judge")) return askBot("court");
   if (q.includes("jee") || q.includes("neet") || q.includes("cuet") || q.includes("ug") || q.includes("pg")) return askBot("jee");
   if (q.includes("bank") || q.includes("thumb") || q.includes("decl")) return askBot("banking");
