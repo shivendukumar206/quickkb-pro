@@ -693,24 +693,43 @@ function printElement(imgId) {
   if (!imgEl || !imgEl.src || imgEl.src === window.location.href) {
     return alert("Please generate or preview the image first!");
   }
-  let pFrame = document.getElementById('hiddenPrintFrame');
-  if (!pFrame) {
-    pFrame = document.createElement('iframe');
-    pFrame.id = 'hiddenPrintFrame';
-    pFrame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
-    document.body.appendChild(pFrame);
+  const printTitle = getFileName(imgId.replace('Preview', '_Print'), 'pdf').replace('.pdf', '');
+  const htmlContent = `<!DOCTYPE html><html><head><title>${printTitle}</title><style>@page{size:A4 portrait;margin:6mm;}html,body{margin:0;padding:0;width:100%;height:98%;display:flex;justify-content:center;align-items:center;overflow:hidden;background:#fff;}img{max-width:100%;max-height:96vh;object-fit:contain;image-rendering:high-quality;}</style></head><body><img id="pImg" src="${imgEl.src}"></body></html>`;
+
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile) {
+    const win = window.open('', '_blank');
+    if (!win) return alert("Please allow pop-ups in browser settings to print!");
+    win.document.open();
+    win.document.write(htmlContent);
+    win.document.close();
+    const pImg = win.document.getElementById('pImg');
+    pImg.onload = function() {
+      setTimeout(function() { win.focus(); win.print(); }, 400);
+    };
+  } else {
+    let pFrame = document.getElementById('hiddenPrintFrame');
+    if (!pFrame) {
+      pFrame = document.createElement('iframe');
+      pFrame.id = 'hiddenPrintFrame';
+      pFrame.style.cssText = 'position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;opacity:0;';
+      document.body.appendChild(pFrame);
+    }
+    const prevTitle = document.title;
+    document.title = printTitle;
+    const doc = pFrame.contentWindow.document;
+    doc.open();
+    doc.write(htmlContent);
+    doc.close();
+    const pImg = doc.getElementById('pImg');
+    pImg.onload = function() {
+      setTimeout(function() {
+        pFrame.contentWindow.focus();
+        pFrame.contentWindow.print();
+        setTimeout(() => { document.title = prevTitle; }, 1000);
+      }, 300);
+    };
   }
-  const doc = pFrame.contentWindow.document;
-  doc.open();
-  doc.write('<!DOCTYPE html><html><head><style>@page{margin:10mm;}body{margin:0;display:flex;justify-content:center;align-items:center;}img{max-width:100%;max-height:95vh;object-fit:contain;}</style></head><body><img id="pImg" src="' + imgEl.src + '"></body></html>');
-  doc.close();
-  const pImg = doc.getElementById('pImg');
-  pImg.onload = function() {
-    setTimeout(function() {
-      pFrame.contentWindow.focus();
-      pFrame.contentWindow.print();
-    }, 300);
-  };
 }
 
 function printIframe(frameId) {
@@ -730,34 +749,35 @@ function setStarRating(stars) {
 
 async function universalShare(docType) {
   const shareText = `Prepared my ${docType} in exact exam size using ${SITE_CONFIG.name}! Try free: ${window.location.href}`;
-  const imgMap = {
-    'Photo': 'pPreview',
-    'Signature': 'sPreview',
-    'Thumb': 'tPreview',
-    'Document': 'scPreview',
-    'ID Card': 'idPreview',
-    'Converted Image': 'convPreview',
-    'A4 Sheet': 'a4Preview',
-    'Privacy Document': 'prvPreview'
-  };
-  const pdfMap = {
-    'Compressed PDF': 'cmpDownload',
-    'PDF Document': 'j2pDownload',
-    'Merged PDF': 'mrgDownload',
-    'Summary Slip': 'txtPdfBtn'
-  };
+  const key = (docType || '').toLowerCase();
+
+  let previewId = null;
+  let pdfLinkId = null;
+
+  if (key.includes('photo')) previewId = 'pPreview';
+  else if (key.includes('sign')) previewId = 'sPreview';
+  else if (key.includes('thumb') || key.includes('decl')) previewId = 'tPreview';
+  else if (key.includes('scan') || key.includes('doc')) previewId = 'scPreview';
+  else if (key.includes('id') || key.includes('aadhar')) previewId = 'idPreview';
+  else if (key.includes('convert')) previewId = 'convPreview';
+  else if (key.includes('sheet') || key.includes('a4')) previewId = 'a4Preview';
+  else if (key.includes('privacy') || key.includes('mask')) previewId = 'prvPreview';
+  else if (key.includes('compress')) pdfLinkId = 'cmpDownload';
+  else if (key.includes('merge')) pdfLinkId = 'mrgDownload';
+  else if (key.includes('slip') || key.includes('summary')) pdfLinkId = 'txtPdfBtn';
+  else if (key.includes('pdf')) pdfLinkId = 'j2pDownload';
 
   let fileToShare = null;
   try {
-    if (imgMap[docType]) {
-      const el = document.getElementById(imgMap[docType]);
+    if (previewId) {
+      const el = document.getElementById(previewId);
       if (el && el.src && el.src.startsWith('data:')) {
         const res = await fetch(el.src);
         const blob = await res.blob();
         fileToShare = new File([blob], getFileName(docType.replace(/\s+/g, '_'), 'jpg'), { type: blob.type || 'image/jpeg' });
       }
-    } else if (pdfMap[docType]) {
-      const link = document.getElementById(pdfMap[docType]);
+    } else if (pdfLinkId) {
+      const link = document.getElementById(pdfLinkId);
       if (link && link.href && link.href.startsWith('blob:')) {
         const res = await fetch(link.href);
         const blob = await res.blob();
