@@ -689,8 +689,22 @@ function calcPercent() {
   }
 }
 function buildCleanFileName(defaultBase, ext) {
-  const renameInput = document.getElementById('autoRename') || document.getElementById('customFileName') || document.querySelector('input[placeholder*="rename" i], input[id*="rename" i]');
-  let raw = (renameInput && renameInput.value.trim()) ? renameInput.value.trim() : defaultBase;
+  let raw = '';
+  document.querySelectorAll('input[type="text"]').forEach(inp => {
+    if (
+      !raw &&
+      inp.id !== 'toolSearch' &&
+      inp.id !== 'photoName' &&
+      (
+        inp.id.toLowerCase().includes('rename') ||
+        (inp.placeholder && inp.placeholder.toLowerCase().includes('rename')) ||
+        (inp.parentElement && inp.parentElement.innerText.toLowerCase().includes('auto-rename'))
+      )
+    ) {
+      if (inp.value && inp.value.trim()) raw = inp.value.trim();
+    }
+  });
+  if (!raw) raw = defaultBase;
   raw = raw.replace(/[^a-zA-Z0-9_\-\u0900-\u097F]/g, '_');
   const cleanExt = (ext || 'jpg').replace(/^\./, '').toLowerCase();
   if (!raw.toLowerCase().endsWith('.' + cleanExt)) {
@@ -699,7 +713,7 @@ function buildCleanFileName(defaultBase, ext) {
   return raw;
 }
 
-// Global Download Extension Guard: Ensures every downloaded image/PDF always has .jpg/.png/.pdf
+// Global Download Extension & Auto-Rename Guard
 document.addEventListener('click', function(e) {
   const a = e.target.closest('a[download]');
   if (!a) return;
@@ -709,8 +723,14 @@ document.addEventListener('click', function(e) {
   if (href.startsWith('data:image/png')) ext = 'png';
   else if (href.startsWith('data:image/webp')) ext = 'webp';
   else if (href.startsWith('data:image/bmp')) ext = 'bmp';
-  else if (href.startsWith('blob:') || href.includes('pdf') || (a.id && a.id.toLowerCase().includes('pdf')) || (a.id && ['cmpDownload', 'j2pDownload', 'mrgDownload', 'txtPdfBtn'].includes(a.id))) ext = 'pdf';
-
+  else if (
+    href.startsWith('blob:') ||
+    href.includes('pdf') ||
+    (a.id && a.id.toLowerCase().includes('pdf')) ||
+    (a.id && ['cmpDownload', 'j2pDownload', 'mrgDownload', 'txtPdfBtn'].includes(a.id))
+  ) {
+    ext = 'pdf';
+  }
   const currentName = (a.getAttribute('download') || 'QuickKB_File').replace(/\.(jpg|jpeg|png|webp|bmp|pdf)$/i, '');
   a.setAttribute('download', buildCleanFileName(currentName, ext));
 }, true);
@@ -772,7 +792,7 @@ function setStarRating(stars) {
 }
 
 async function universalShare(docType) {
-  const shareText = `Prepared my ${docType} in exact exam size using ${SITE_CONFIG.name}! Try free: ${window.location.href}`;
+  const shareText = `Made with QuickKB Pro ⚡ https://vercel.app`;
   const key = (docType || '').toLowerCase();
 
   let previewId = null;
