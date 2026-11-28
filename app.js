@@ -688,25 +688,47 @@ function calcPercent() {
     document.getElementById('calcStatus').innerText = `✅ Exact Marks Obtained: ${obtMarks} / ${max} (${pct.toFixed(2)}%)`;
   }
 }
+function buildCleanFileName(defaultBase, ext) {
+  const renameInput = document.getElementById('autoRename') || document.getElementById('customFileName') || document.querySelector('input[placeholder*="rename" i], input[id*="rename" i]');
+  let raw = (renameInput && renameInput.value.trim()) ? renameInput.value.trim() : defaultBase;
+  raw = raw.replace(/[^a-zA-Z0-9_\-\u0900-\u097F]/g, '_');
+  const cleanExt = (ext || 'jpg').replace(/^\./, '').toLowerCase();
+  if (!raw.toLowerCase().endsWith('.' + cleanExt)) {
+    raw = raw + '.' + cleanExt;
+  }
+  return raw;
+}
+
+// Global Download Extension Guard: Ensures every downloaded image/PDF always has .jpg/.png/.pdf
+document.addEventListener('click', function(e) {
+  const a = e.target.closest('a[download]');
+  if (!a) return;
+  const href = a.getAttribute('href') || '';
+  if (!href || href === '#') return;
+  let ext = 'jpg';
+  if (href.startsWith('data:image/png')) ext = 'png';
+  else if (href.startsWith('data:image/webp')) ext = 'webp';
+  else if (href.startsWith('data:image/bmp')) ext = 'bmp';
+  else if (href.startsWith('blob:') || href.includes('pdf') || (a.id && a.id.toLowerCase().includes('pdf')) || (a.id && ['cmpDownload', 'j2pDownload', 'mrgDownload', 'txtPdfBtn'].includes(a.id))) ext = 'pdf';
+
+  const currentName = (a.getAttribute('download') || 'QuickKB_File').replace(/\.(jpg|jpeg|png|webp|bmp|pdf)$/i, '');
+  a.setAttribute('download', buildCleanFileName(currentName, ext));
+}, true);
+
 function printElement(imgId) {
   const imgEl = document.getElementById(imgId);
   if (!imgEl || !imgEl.src || imgEl.src === window.location.href) {
     return alert("Please generate or preview the image first!");
   }
-  const printTitle = getFileName(imgId.replace('Preview', '_Print'), 'pdf').replace('.pdf', '');
-  const htmlContent = `<!DOCTYPE html><html><head><title>${printTitle}</title><style>@page{size:A4 portrait;margin:6mm;}html,body{margin:0;padding:0;width:100%;height:98%;display:flex;justify-content:center;align-items:center;overflow:hidden;background:#fff;}img{max-width:100%;max-height:96vh;object-fit:contain;image-rendering:high-quality;}</style></head><body><img id="pImg" src="${imgEl.src}"></body></html>`;
-
+  const printTitle = buildCleanFileName(imgId.replace('Preview', '_Print'), 'pdf').replace(/\.pdf$/i, '');
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
   if (isMobile) {
     const win = window.open('', '_blank');
     if (!win) return alert("Please allow pop-ups in browser settings to print!");
     win.document.open();
-    win.document.write(htmlContent);
+    win.document.write(`<!DOCTYPE html><html><head><title>${printTitle}</title><meta name="viewport" content="width=device-width,initial-scale=1.0"><style>@page{size:A4 portrait;margin:5mm;}html,body{margin:0;padding:0;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#fff;}img{max-width:98%;max-height:90vh;object-fit:contain;}.pbtn{margin-top:14px;padding:12px 24px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:bold;box-shadow:0 4px 12px rgba(37,99,235,0.3);}@media print{.pbtn{display:none!important;}}</style></head><body><img src="${imgEl.src}" onload="setTimeout(function(){window.print();},250)"><button class="pbtn" onclick="window.print()">🖨 Tap Here to Print</button></body></html>`);
     win.document.close();
-    const pImg = win.document.getElementById('pImg');
-    pImg.onload = function() {
-      setTimeout(function() { win.focus(); win.print(); }, 400);
-    };
   } else {
     let pFrame = document.getElementById('hiddenPrintFrame');
     if (!pFrame) {
@@ -715,8 +737,7 @@ function printElement(imgId) {
       pFrame.style.cssText = 'position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;opacity:0;';
       document.body.appendChild(pFrame);
     }
-    const prevTitle = document.title;
-    document.title = printTitle;
+    const htmlContent = `<!DOCTYPE html><html><head><title>${printTitle}</title><style>@page{size:A4 portrait;margin:6mm;}html,body{margin:0;padding:0;width:100%;height:98%;display:flex;justify-content:center;align-items:center;overflow:hidden;background:#fff;}img{max-width:100%;max-height:96vh;object-fit:contain;}</style></head><body><img id="pImg" src="${imgEl.src}"></body></html>`;
     const doc = pFrame.contentWindow.document;
     doc.open();
     doc.write(htmlContent);
@@ -726,7 +747,6 @@ function printElement(imgId) {
       setTimeout(function() {
         pFrame.contentWindow.focus();
         pFrame.contentWindow.print();
-        setTimeout(() => { document.title = prevTitle; }, 1000);
       }, 300);
     };
   }
@@ -734,7 +754,11 @@ function printElement(imgId) {
 
 function printIframe(frameId) {
   const frame = document.getElementById(frameId);
-  if (frame && frame.contentWindow) {
+  if (!frame) return alert("Please generate or preview the PDF first!");
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile && frame.src) {
+    window.open(frame.src, '_blank');
+  } else if (frame.contentWindow) {
     frame.contentWindow.focus();
     frame.contentWindow.print();
   }
@@ -774,14 +798,19 @@ async function universalShare(docType) {
       if (el && el.src && el.src.startsWith('data:')) {
         const res = await fetch(el.src);
         const blob = await res.blob();
-        fileToShare = new File([blob], getFileName(docType.replace(/\s+/g, '_'), 'jpg'), { type: blob.type || 'image/jpeg' });
+        const isPng = el.src.startsWith('data:image/png');
+        const ext = isPng ? 'png' : 'jpg';
+        const mime = isPng ? 'image/png' : 'image/jpeg';
+        const finalImgName = buildCleanFileName('QuickKB_' + docType.replace(/\s+/g, '_'), ext);
+        fileToShare = new File([blob], finalImgName, { type: mime });
       }
     } else if (pdfLinkId) {
       const link = document.getElementById(pdfLinkId);
       if (link && link.href && link.href.startsWith('blob:')) {
         const res = await fetch(link.href);
         const blob = await res.blob();
-        fileToShare = new File([blob], link.download || 'QuickKB_Document.pdf', { type: 'application/pdf' });
+        const finalPdfName = buildCleanFileName('QuickKB_' + docType.replace(/\s+/g, '_'), 'pdf');
+        fileToShare = new File([blob], finalPdfName, { type: 'application/pdf' });
       }
     }
   } catch (e) {}
