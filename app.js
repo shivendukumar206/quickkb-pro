@@ -688,17 +688,37 @@ function calcPercent() {
     document.getElementById('calcStatus').innerText = `✅ Exact Marks Obtained: ${obtMarks} / ${max} (${pct.toFixed(2)}%)`;
   }
 }
-
 function printElement(imgId) {
-  const src = document.getElementById(imgId).src;
-  const win = window.open('', '_blank');
-  win.document.write(`<html><body style="text-align:center;margin:20px;"><img src="${src}" style="max-width:100%;" onload="window.print();window.close();"></body></html>`);
-  win.document.close();
+  const imgEl = document.getElementById(imgId);
+  if (!imgEl || !imgEl.src || imgEl.src === window.location.href) {
+    return alert("Please generate or preview the image first!");
+  }
+  let pFrame = document.getElementById('hiddenPrintFrame');
+  if (!pFrame) {
+    pFrame = document.createElement('iframe');
+    pFrame.id = 'hiddenPrintFrame';
+    pFrame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
+    document.body.appendChild(pFrame);
+  }
+  const doc = pFrame.contentWindow.document;
+  doc.open();
+  doc.write('<!DOCTYPE html><html><head><style>@page{margin:10mm;}body{margin:0;display:flex;justify-content:center;align-items:center;}img{max-width:100%;max-height:95vh;object-fit:contain;}</style></head><body><img id="pImg" src="' + imgEl.src + '"></body></html>');
+  doc.close();
+  const pImg = doc.getElementById('pImg');
+  pImg.onload = function() {
+    setTimeout(function() {
+      pFrame.contentWindow.focus();
+      pFrame.contentWindow.print();
+    }, 300);
+  };
 }
 
 function printIframe(frameId) {
   const frame = document.getElementById(frameId);
-  if (frame && frame.contentWindow) frame.contentWindow.print();
+  if (frame && frame.contentWindow) {
+    frame.contentWindow.focus();
+    frame.contentWindow.print();
+  }
 }
 
 let baseVotes = 18950;
@@ -708,11 +728,58 @@ function setStarRating(stars) {
   document.getElementById('ratingText').innerHTML = `<strong>${stars}.0 / 5</strong> (${(baseVotes + 1).toLocaleString()}+ Votes — Thanks!)`;
 }
 
-function universalShare(docType) {
+async function universalShare(docType) {
   const shareText = `Prepared my ${docType} in exact exam size using ${SITE_CONFIG.name}! Try free: ${window.location.href}`;
-  if (navigator.share) {
-    navigator.share({ title: SITE_CONFIG.name, text: shareText, url: window.location.href }).catch(() => {});
+  const imgMap = {
+    'Photo': 'pPreview',
+    'Signature': 'sPreview',
+    'Thumb': 'tPreview',
+    'Document': 'scPreview',
+    'ID Card': 'idPreview',
+    'Converted Image': 'convPreview',
+    'A4 Sheet': 'a4Preview',
+    'Privacy Document': 'prvPreview'
+  };
+  const pdfMap = {
+    'Compressed PDF': 'cmpDownload',
+    'PDF Document': 'j2pDownload',
+    'Merged PDF': 'mrgDownload',
+    'Summary Slip': 'txtPdfBtn'
+  };
+
+  let fileToShare = null;
+  try {
+    if (imgMap[docType]) {
+      const el = document.getElementById(imgMap[docType]);
+      if (el && el.src && el.src.startsWith('data:')) {
+        const res = await fetch(el.src);
+        const blob = await res.blob();
+        fileToShare = new File([blob], getFileName(docType.replace(/\s+/g, '_'), 'jpg'), { type: blob.type || 'image/jpeg' });
+      }
+    } else if (pdfMap[docType]) {
+      const link = document.getElementById(pdfMap[docType]);
+      if (link && link.href && link.href.startsWith('blob:')) {
+        const res = await fetch(link.href);
+        const blob = await res.blob();
+        fileToShare = new File([blob], link.download || 'QuickKB_Document.pdf', { type: 'application/pdf' });
+      }
+    }
+  } catch (e) {}
+
+  if (fileToShare && navigator.canShare && navigator.canShare({ files: [fileToShare] })) {
+    navigator.share({
+      files: [fileToShare],
+      title: SITE_CONFIG.name,
+      text: shareText
+    }).catch(() => {});
+  } else if (navigator.share) {
+    navigator.share({
+      title: SITE_CONFIG.name,
+      text: shareText,
+      url: window.location.href
+    }).catch(() => {});
   } else {
-    alert("Link copied! Share anywhere: " + window.location.href);
+    if (navigator.clipboard) navigator.clipboard.writeText(shareText).catch(() => {});
+    alert("Link copied! (Direct file share works on Mobile browsers — on PC please use Download button)\n\n" + shareText);
   }
 }
